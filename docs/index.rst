@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pyonyphe's documentation!
+pyonyphe - official python libraby for Onyphe
 ====================================
+This is the official Python wrapper around both the Onyphe REST API
+
 
 .. toctree::
    :maxdepth: 2
