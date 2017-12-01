@@ -17,7 +17,7 @@ Examples
 .. toctree::
     :maxdepth: 2
 
-    examples/basic-search
+    examples/search-ip.rst
     examples/query-summary
     examples/cert-stream
     examples/gifcreator

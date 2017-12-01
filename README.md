@@ -2,7 +2,7 @@
 
 Client python for https://www.onyphe.io
 
-API documentations: 
+API documentations:
 
 # dependecies
 
@@ -12,11 +12,13 @@ API documentations:
 
 python3 setup.py install
 
-# Examples
+# Documentation
+
+Documentation is available at https://pyonyphe.readthedocs.io
 
 ```python
 from onyphe import Onyphe
-on_client = Onypyhe(apikey)
+on_client = Onyphe(apikey)
 on_client.ip('8.8.8.8')
 ```
 
