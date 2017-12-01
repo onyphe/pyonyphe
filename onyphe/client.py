@@ -1,5 +1,6 @@
 from urllib.parse import urljoin
 from onyphe.exception import APIError
+
 """
 onyphe.client
 ~~~~~~~~~~~~~
@@ -77,21 +78,20 @@ class Onyphe:
     def synscan(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/synscan/<IP>
 
-        :param ip: IPv4 or IPv6 address
-        :type ip: str
-        :returns: dict -- a dictionary containing the results of the search about synscans.
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of the search about synscans.
         """
         return self._prepare_request('/'.join([self.version, 'synscan', ip]))
 
     def pastries(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/pastries/<IP>
 
-                :param ip: IPv4 or IPv6 address
-                :type ip: str
-                :returns: dict -- a dictionary containing the results of the search in pasties recorded by the service.
-                """
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of the search in pasties recorded by the service.
+        """
         return self._prepare_request('/'.join([self.version, 'pastries', ip]))
-
 
     def geoloc(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/geoloc/<IP>
@@ -105,27 +105,27 @@ class Onyphe:
     def inetnum(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/inetnum/<IP>
 
-                        :param ip: IPv4 or IPv6 address
-                        :type ip: str
-                        :returns: dict -- a dictionary containing the results of inetnum of IP
-                """
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of inetnum of IP
+        """
         return self._prepare_request('/'.join([self.version, 'inetnum', ip]))
 
     def threatlist(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/threatlist/<IP>
 
-                                :param ip: IPv4 or IPv6 address
-                                :type ip: str
-                                :returns: dict -- a dictionary containing the results of the IP in threatlists
-                        """
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of the IP in threatlists
+        """
         return self._prepare_request('/'.join([self.version, 'threatlist', ip]))
 
     def forward(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/forward/<IP>
 
-                                :param ip: IPv4 or IPv6 address
-                                :type ip: str
-                                :returns: dict -- a dictionary containing the results of forward of IP
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of forward of IP
         """
         return self._prepare_request('/'.join([self.version, 'forward', ip]))
 
@@ -150,7 +150,7 @@ class Onyphe:
     def datascan(self, data):
         """Call API Onyphe https://www.onyphe.io/api/v1/datascan/<IP>
 
-            :param data: IPv4/IPv6 address or search word
+            :param data: IPv4/IPv6 address
             :type data: str
             :returns: dict -- a dictionary containing Information scan on IP or string
         """
