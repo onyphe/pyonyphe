@@ -5,9 +5,10 @@
 
 pyonyphe - official python libraby for Onyphe
 ====================================
-This is the official Python wrapper around both the Onyphe REST API
+This is the official Python wrapper around both the Onyphe REST API.
 
-
+Introduction
+~~~~~~~~~~~~
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -15,7 +16,7 @@ This is the official Python wrapper around both the Onyphe REST API
 
 
 Indices and tables
-==================
+~~~~~~~~~~~~
 
 * :ref:`genindex`
 * :ref:`modindex`
