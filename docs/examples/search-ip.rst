@@ -11,7 +11,7 @@ Search Information on an IP
     import onyphe
 
     API_KEY = "YOUR_API_KEY"
-    ip = sys.argv['1']
+    ip = sys.argv[1]
     #Input validation
     if len(sys.argv) == 1:
         print('Usage: %s ' % sys.argv[0])
