@@ -4,20 +4,27 @@
    contain the root `toctree` directive.
 
 pyonyphe - official python libraby for Onyphe
-====================================
+===================================================================
 This is the official Python wrapper around both the Onyphe REST API.
 
 Introduction
 ~~~~~~~~~~~~
+
+tutorial
+
+Examples
+~~~~~~~~
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
 
+    examples/basic-search
+    examples/query-summary
+    examples/cert-stream
+    examples/gifcreator
 
+API Reference
+~~~~~~~~~~~~~
+.. toctree::
+    :maxdepth: 2
 
-Indices and tables
-~~~~~~~~~~~~
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    api
