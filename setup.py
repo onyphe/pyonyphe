@@ -5,7 +5,7 @@ setup(
     version='1.0',
     packages=['onyphe'],
     url='https://github.com/sebdraven/pyonyphe',
-    license='GPL-v3',
+    license='MIT',
     author='Sebastien Larinier',
     author_email='slarinier@gmail.com',
     description=''
