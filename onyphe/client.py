@@ -1,5 +1,7 @@
+import logging
 from urllib.parse import urljoin
 from onyphe.exception import APIError
+
 
 """
 onyphe.client
@@ -10,7 +12,7 @@ This module implements the Onyphe API.
 :copyright: (c) 2017- by Sebastien Larinier
 """
 import requests
-
+from requests.utils import quote
 
 class Onyphe:
     """Wrapper around the Onyphe REST
@@ -31,8 +33,8 @@ class Onyphe:
         }
 
     def _choose_url(self, uri):
-
         self.url = urljoin(self.base_url, uri)
+        print(self.url)
 
     def _request(self, method, payload):
 
@@ -64,16 +66,23 @@ class Onyphe:
 
         return data
 
-    def _prepare_request(self, uri):
+    def _prepare_request(self, uri, **kwargs):
         payload = {
             'apikey': self.api_key
         }
+
+        if 'page' in kwargs:
+            payload['page'] = kwargs['page']
 
         self._choose_url(uri)
 
         data = self._request('get', payload)
         if data:
             return data
+
+    def __search(self,query, endpoint, **kwargs):
+        return self._prepare_request(quote('/'.join([self.version, 'search',
+                                               endpoint, query])), **kwargs)
 
     def synscan(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/synscan/<IP>
@@ -155,3 +164,55 @@ class Onyphe:
             :returns: dict -- a dictionary containing Information scan on IP or string
         """
         return self._prepare_request('/'.join([self.version, 'datascan', data]))
+
+    def search_datascan(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/datascan/<query>
+        :param query: example product:Apache port:443 os:Windows.
+        :type: str
+        :return: dict -- a dictionary with result
+        """
+
+        return self.__search(query, 'datascan', **kwargs)
+
+    def search_synscan(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/syscan/<query>
+        :param query: example ip:46.105.48.0/21 os:Linux port:23.
+        :type: str
+        :return: dict -- a dictionary with result
+        """
+        return self.__search(query, 'synscan', **kwargs)
+
+    def search_inetnum(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/inetnum/<query>
+        :param query: example organization:"OVH SAS"
+        :type: str
+        :return: dict -- a dictionary with result
+        """
+        return self.__search(query, 'inetnum', **kwargs)
+
+    def search_threatlist(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/threatlist/<query>
+        :param query: example: country:RU or ip:94.253.102.185
+        :type: str
+        :return: dict -- a dictionary with result
+        """
+        return self.__search(query, 'threatlist', **kwargs)
+
+    def search_pastries(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/pastries/<query>
+        :param query: example: domain:amazonaws.com or ip:94.253.102.185
+        :type: str
+        :return: dict -- a dictionary with result
+        """
+        return self.__search(query, 'pastries', **kwargs)
+
+    def search_resolver(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/resolver/<query>
+                :param query: example: domain:amazonaws.com
+                :type: str
+                :return: dict -- a dictionary with result
+                """
+        return self.__search(query, 'resolver', **kwargs)
+
+
+
