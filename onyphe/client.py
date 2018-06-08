@@ -35,7 +35,6 @@ class Onyphe:
     def _choose_url(self, uri):
         self.url = urljoin(self.base_url, uri)
 
-
     def _request(self, method, payload):
 
         data = None
