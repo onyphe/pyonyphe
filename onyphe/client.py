@@ -101,6 +101,20 @@ class Onyphe:
         """
         return self._prepare_request('/'.join([self.version, 'pastries', ip]))
 
+    def myip(self):
+        """Call API Onyphe https://www.onyphe.io/api/v1/myip
+
+                :returns: dict -- a dictionary containing the results of myip
+        """
+        return self._prepare_request('/'.join([self.version, 'myip']))
+
+    def user(self):
+        """Call API Onyphe https://www.onyphe.io/api/v1/user
+
+                :returns: dict -- a dictionary containing the results of user
+        """
+        return self._prepare_request('/'.join([self.version, 'user']))
+
     def geoloc(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v1/geoloc/<IP>
 
@@ -164,6 +178,42 @@ class Onyphe:
         """
         return self._prepare_request('/'.join([self.version, 'datascan', data]))
 
+    def onionscan(self, onion):
+        """Call API Onyphe https://www.onyphe.io/api/v1/onionscan/<ONION>
+
+            :param onion: onion address
+            :type onion: str
+            :returns: dict -- a dictionary containing all information of onion site
+        """
+        return self._prepare_request('/'.join([self.version, 'onionscan', onion]))
+
+    def ctl(self, domain):
+        """Call API Onyphe https://www.onyphe.io/api/v1/ctl/<DOMAIN>
+
+            :param domain: domain name
+            :type domain: str
+            :returns: dict -- a dictionary containing all informations of domain name certificates
+        """
+        return self._prepare_request('/'.join([self.version, 'ctl', domain]))
+
+    def sniffer(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v1/sniffer/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing all informations of IP
+        """
+        return self._prepare_request('/'.join([self.version, 'sniffer', ip]))
+
+    def md5(self, md5):
+        """Call API Onyphe https://www.onyphe.io/api/v1/md5/<MD5>
+
+            :param md5: md5 hash
+            :type md5: str
+            :returns: dict -- a dictionary containing all informations of md5 hash
+        """
+        return self._prepare_request('/'.join([self.version, 'md5', md5]))
+
     def search_datascan(self, query, **kwargs):
         """Call API Onyphe https://www.onyphe.io/api/v1/search/datascan/<query>
         :param query: example product:Apache port:443 os:Windows.
@@ -213,5 +263,26 @@ class Onyphe:
                 """
         return self.__search(query, 'resolver', **kwargs)
 
+    def search_sniffer(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/sniffer/<query>
+                :param query: example: ip:14.164.0.0/14
+                :type: str
+                :return: dict -- a dictionary with result
+                """
+        return self.__search(query, 'sniffer', **kwargs)
 
+    def search_ctl(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/ctl/<query>
+                :param query: example: host:vpn
+                :type: str
+                :return: dict -- a dictionary with result
+                """
+        return self.__search(query, 'ctl', **kwargs)
 
+    def search_onionscan(self, query, **kwargs):
+        """Call API Onyphe https://www.onyphe.io/api/v1/search/onionscan/<query>
+                :param query: example: data:market
+                :type: str
+                :return: dict -- a dictionary with result
+                """
+        return self.__search(query, 'onionscan', **kwargs)
