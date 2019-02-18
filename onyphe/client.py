@@ -49,6 +49,8 @@ class Onyphe:
             raise APIError('Page Not found %s' % self.url)
         elif response.status_code == requests.codes.FORBIDDEN:
             raise APIError('Access Forbidden')
+        elif response.status_code == requests.codes.too_many_requests:
+            raise APIError('Too Many Requests')
         elif response.status_code != requests.codes.OK:
             try:
                 error = response.json()['message']
