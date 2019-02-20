@@ -55,7 +55,7 @@ class Onyphe:
             try:
                 error = response.json()['message']
             except Exception as e:
-                error = 'Invalid API key'
+                error = 'Unknown error'
 
             raise APIError(error)
         try:
