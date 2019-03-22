@@ -1,5 +1,5 @@
 import logging
-from urllib.parse import urljoin
+from six.moves.urllib.parse import urljoin
 from onyphe.exception import APIError
 
 
