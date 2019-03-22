@@ -1,5 +1,9 @@
+import sys
 import logging
-from six.moves.urllib.parse import urljoin
+if sys.version_info.major == 2:
+    from urlparse import urljoin
+elif sys.version_info.major == 3:
+    urllib.parse import urljoin
 from onyphe.exception import APIError
 
 
