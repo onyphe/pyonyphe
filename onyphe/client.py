@@ -3,7 +3,7 @@ import logging
 if sys.version_info.major == 2:
     from urlparse import urljoin
 elif sys.version_info.major == 3:
-    urllib.parse import urljoin
+    from urllib.parse import urljoin
 from onyphe.exception import APIError
 
 
