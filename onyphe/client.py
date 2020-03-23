@@ -104,7 +104,6 @@ class Onyphe:
         """
         return self._prepare_request('/'.join([self.version, 'summary/ip', ip]))
 
-
     def summary_domain(self, domain):
         """Call API Onyphe https://www.onyphe.io/api/v2/summary/domain/<domain>
 
@@ -124,7 +123,6 @@ class Onyphe:
                 """
         return self._prepare_request(
             '/'.join([self.version, 'summary/hostname', hostname]))
-
 
     def simple_synscan(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/simple/synscan/<IP>
@@ -211,4 +209,4 @@ class Onyphe:
 
                :return: dict -- a dictionary with result
         """
-        return self._prepare_request('/'.join([self.version,'alert/list']))
+        return self._prepare_request('/'.join([self.version, 'alert/list']))
