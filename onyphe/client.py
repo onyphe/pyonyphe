@@ -206,3 +206,9 @@ class Onyphe:
 
         return self.__search(query, 'datascan', **kwargs)
 
+    def alert_list(self):
+        """Call API Onyphe https://www.onyphe.io/api/v2/alert/list
+
+               :return: dict -- a dictionary with result
+        """
+        return self._prepare_request('/'.join([self.version,'alert/list']))
