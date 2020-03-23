@@ -49,11 +49,13 @@ class Onyphe:
             raise APIError('Page Not found %s' % self.url)
         elif response.status_code == requests.codes.FORBIDDEN:
             raise APIError('Access Forbidden')
+        elif response.status_code == requests.codes.too_many_requests:
+            raise APIError('Too Many Requests')
         elif response.status_code != requests.codes.OK:
             try:
                 error = response.json()['text']
             except Exception as e:
-                error = 'Invalid API key'
+                error = 'Unknown error'
 
             raise APIError(error)
         try:
@@ -102,6 +104,7 @@ class Onyphe:
         """
         return self._prepare_request('/'.join([self.version, 'summary/ip', ip]))
 
+
     def summary_domain(self, domain):
         """Call API Onyphe https://www.onyphe.io/api/v2/summary/domain/<domain>
 
@@ -122,105 +125,6 @@ class Onyphe:
         return self._prepare_request(
             '/'.join([self.version, 'summary/hostname', hostname]))
 
-    def simple_geoloc(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/geoloc/<IP>
-
-                :param ip: IPv4 or IPv6 address
-                :type ip: str
-                :returns: dict -- a dictionary containing the results of geolocation of IP
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/geoloc', ip]))
-
-    def simple_inetnum(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/inetnum/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of inetnum of IP
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/inetnum', ip]))
-
-    def simple_pastries(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/pastries/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of the search in pasties recorded by the service.
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/pastries', ip]))
-
-    def simple_threatlist(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/threatlist/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of the IP in threatlists
-        """
-        return self._prepare_request('/'.join([self.version,
-                                               'simple/threatlist', ip]))
-
-    def simple_datascan(self, data):
-        """Call API Onyphe https://www.onyphe.io/api/v2/datascan/{<IP>,<str}
-
-            :param data: IPv4/IPv6 address or str
-            :type data: str
-            :returns: dict -- a dictionary containing Information scan on IP or string
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/datascan', data]))
-
-    def simple_topsite(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/topsite/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of topsite of IP
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/topsite', ip]))
-
-    def simple_vulscan(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/vulnscan/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of vulnscan of IP
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/vulnscan', ip]))
-
-    def simple_datashot(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/datashost/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of datashost of IP
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/datashot', ip]))
-
-    def simple_resolver(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/resolver/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of resolver of IP
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/resolver', ip]))
-
-    def simple_sniffer(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/sniffer/<IP>
-
-            :param ip: IPv4 or IPv6 address
-            :type ip: str
-            :returns: dict -- a dictionary containing the results of sniffer of IP
-        """
-        return self._prepare_request(
-            '/'.join([self.version, 'simple/sniffer', ip]))
 
     def simple_synscan(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/simple/synscan/<IP>
@@ -274,7 +178,6 @@ class Onyphe:
 
     def simple_resolver_forward(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/resolver/forward/<IP>
-
              :param ip: IPv4 or IPv6 address
              :type ip: str
              :returns: dict -- a dictionary containing the results of forward of IP
@@ -302,3 +205,4 @@ class Onyphe:
         """
 
         return self.__search(query, 'datascan', **kwargs)
+
