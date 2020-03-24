@@ -1,3 +1,4 @@
+import json
 import logging
 from urllib.parse import urljoin
 from onyphe.exception import APIError
@@ -35,12 +36,13 @@ class Onyphe:
     def _choose_url(self, uri):
         self.url = urljoin(self.base_url, uri)
 
-    def _request(self, method, payload):
+    def _request(self, method, payload, json_data):
 
         data = None
 
         try:
-            response = self.methods[method](self.url, params=payload)
+            response = self.methods[method](self.url, params=payload,
+                                            data=json.dumps(json_data))
         except:
             raise APIError('Unable to connect to Onyphe')
 
@@ -68,16 +70,23 @@ class Onyphe:
         return data
 
     def _prepare_request(self, uri, **kwargs):
-        payload = {
+        params = {
             'apikey': self.api_key
         }
 
+        json_data = None
+
         if 'page' in kwargs:
-            payload['page'] = kwargs['page']
+            params['page'] = kwargs['page']
+
+        if 'json_data' in kwargs:
+            json_data = kwargs['json_data']
+
+        method = kwargs['method']
 
         self._choose_url(uri)
 
-        data = self._request('get', payload)
+        data = self._request(method, params, json_data)
         if data:
             return data
 
@@ -93,7 +102,8 @@ class Onyphe:
             :type ip: str
             :returns: dict -- a dictionary containing the results of the search about synscans.
         """
-        return self._prepare_request('/'.join([self.version, 'synscan', ip]))
+        return self._prepare_request('/'.join([self.version, 'synscan', ip]),
+                                     method='get')
 
     def summary_ip(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/summary/ip/<IP>
@@ -102,7 +112,8 @@ class Onyphe:
             :type ip: str
             :returns: dict -- a dictionary containing all informations of IP
         """
-        return self._prepare_request('/'.join([self.version, 'summary/ip', ip]))
+        return self._prepare_request('/'.join([self.version, 'summary/ip', ip]),
+                                     method='get')
 
     def summary_domain(self, domain):
         """Call API Onyphe https://www.onyphe.io/api/v2/summary/domain/<domain>
@@ -112,7 +123,7 @@ class Onyphe:
                     :returns: dict -- a dictionary containing the results of the summary of domain.
                 """
         return self._prepare_request(
-            '/'.join([self.version, 'summary/domain', domain]))
+            '/'.join([self.version, 'summary/domain', domain]), method='get')
 
     def summary_hostname(self, hostname):
         """Call API Onyphe https://www.onyphe.io/api/v2/summary/hostname/<hostname>
@@ -122,7 +133,58 @@ class Onyphe:
                     :returns: dict -- a dictionary containing the results of the summary of hostname.
                 """
         return self._prepare_request(
-            '/'.join([self.version, 'summary/hostname', hostname]))
+            '/'.join([self.version, 'summary/hostname', hostname]),
+            method='get')
+
+    def simple_geoloc(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/synscan/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of synscan of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/synscan', ip]), method='get')
+
+    def simple_inetnum(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/inetnum/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of inetnum of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/inetnum', ip]), method='get')
+
+    def simple_pastries(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/pastries/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of pastries of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/pastries', ip]), method='get')
+
+    def simple_resolver(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/resolver/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of resolver of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/resolver', ip]), method='get')
+
+    def simple_sniffer(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/sniffer/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of sniffer of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/sniffer', ip]), method='get')
 
     def simple_synscan(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/simple/synscan/<IP>
@@ -132,7 +194,37 @@ class Onyphe:
             :returns: dict -- a dictionary containing the results of synscan of IP
         """
         return self._prepare_request(
-            '/'.join([self.version, 'simple/synscan', ip]))
+            '/'.join([self.version, 'simple/synscan', ip]), method='get')
+
+    def simple_threatlist(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/threatlist/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of threatlist of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/threatlist', ip]), method='get')
+
+    def simple_topsite(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/topsite/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of topsite of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/topsite', ip]), method='get')
+
+    def simple_vulnscan(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/vulnscan/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of vulnscan of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/vulnscan', ip]), method='get')
 
     def simple_onionshot(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/simple/onionshot/<IP>
@@ -142,7 +234,17 @@ class Onyphe:
             :returns: dict -- a dictionary containing the results of onionshot of IP
         """
         return self._prepare_request(
-            '/'.join([self.version, 'simple/onionshot', ip]))
+            '/'.join([self.version, 'simple/onionshot', ip]), method='get')
+
+    def simple_datashot(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/datashot/<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of datashot of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/datashot', ip]), method='get')
 
     def simple_ctl(self, data):
         """Call API Onyphe https://www.onyphe.io/api/v2/ctl/{<IP>,<str}
@@ -152,7 +254,7 @@ class Onyphe:
             :returns: dict -- a dictionary containing Information on ctl on domain or hostname
         """
         return self._prepare_request(
-            '/'.join([self.version, 'simple/ctl', data]))
+            '/'.join([self.version, 'simple/ctl', data]), method='get')
 
     def simple_onionscan(self, data):
         """Call API Onyphe https://www.onyphe.io/api/v2/onionscan/{<IP>,<str}
@@ -162,7 +264,17 @@ class Onyphe:
             :returns: dict -- a dictionary containing Information onionscan on domain or hostname
         """
         return self._prepare_request(
-            '/'.join([self.version, 'simple/onionscan', data]))
+            '/'.join([self.version, 'simple/onionscan', data]), method='get')
+
+    def simple_datascan(self, data):
+        """Call API Onyphe https://www.onyphe.io/api/v2/datascan/{<IP>,<str}
+
+            :param data: IP or hostname
+            :type data: str
+            :returns: dict -- a dictionary containing Information on datascan on IP or hostname
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/datascan', data]), method='get')
 
     def simple_datascan_datamd5(self, data_md5):
         """Call API Onyphe https://www.onyphe.io/api/v2/datascan/datamd5/<data_md5>
@@ -172,8 +284,9 @@ class Onyphe:
            :returns: dict -- a dictionary containing Information onionscan on domain or hostname
         """
         return self._prepare_request(
-            '/'.join([self.version, 'simple/datascan/datamd5', data_md5]))
-
+            '/'.join([self.version, 'simple/datascan/datamd5', data_md5]),
+            method='get')
+    
     def simple_resolver_forward(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/resolver/forward/<IP>
              :param ip: IPv4 or IPv6 address
@@ -193,7 +306,8 @@ class Onyphe:
 
     def __resolver(self, ip, type_resolv):
         return self._prepare_request(
-            '/'.join([self.version, 'simple/resolver/%s' % type_resolv, ip]))
+            '/'.join([self.version, 'simple/resolver/%s' % type_resolv, ip]),
+            method='get')
 
     def search(self, query, **kwargs):
         """Call API Onyphe https://www.onyphe.io/api/v2/search/<query>
@@ -201,7 +315,7 @@ class Onyphe:
         :type: str
         :return: dict -- a dictionary with result
         """
-
+        kwargs['method'] = 'get'
         return self.__search(query, 'datascan', **kwargs)
 
     def alert_list(self):
@@ -209,4 +323,37 @@ class Onyphe:
 
                :return: dict -- a dictionary with result
         """
-        return self._prepare_request('/'.join([self.version, 'alert/list']))
+        return self._prepare_request('/'.join([self.version, 'alert/list']),
+                                     method='get')
+
+    def add_alert(self, query, name, email):
+        """Call API Onyphe https://www.onyphe.io/api/v2/alert/add
+                :param query
+                :type: str
+                :param: name name of alert
+                :type: str
+                :param: email email to receive alerts
+                :type: str
+               :return: dict -- a dictionary with result
+        """
+        if query and name and email:
+            data = {'query': query, 'name': name, 'email': email}
+
+            return self._prepare_request('/'.join([self.version,
+                                                   'alert/add']),
+                                         method='post', json_data=data)
+        else:
+            raise APIError('Parameters Invalid')
+
+    def del_alert(self, id_alert):
+        """Call API Onyphe https://www.onyphe.io/api/v2/alert/del
+
+        :param id_alert: id of alert to delete
+        :return: dict -- a dictionary with result
+        """
+        if id_alert:
+            return self._prepare_request('/'.join([self.version,
+                                                   'alert/del', id_alert]),
+                                         method='post')
+        else:
+            raise APIError('Parameter Invalid')
