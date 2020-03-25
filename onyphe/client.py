@@ -325,7 +325,7 @@ class Onyphe:
     def search(self, query, **kwargs):
         """Call API Onyphe https://www.onyphe.io/api/v2/search/<query>
         :param query: example product:Apache port:443 os:Windows.
-        :type: str
+        :type query: str
         :return: dict -- a dictionary with result
         """
         kwargs['method'] = 'get'
@@ -341,13 +341,13 @@ class Onyphe:
 
     def add_alert(self, query, name, email):
         """Call API Onyphe https://www.onyphe.io/api/v2/alert/add
-                :param query
-                :type: str
-                :param: name name of alert
-                :type: str
-                :param: email email to receive alerts
-                :type: str
-               :return: dict -- a dictionary with result
+            :param query: query language onyphe
+            :type query: str
+            :param name: name of alert
+            :type name: str
+            :param email: email to receive alerts
+            :type email: str
+           :return: dict -- a dictionary with result
         """
         if query and name and email:
             data = {'query': query, 'name': name, 'email': email}
@@ -362,6 +362,7 @@ class Onyphe:
         """Call API Onyphe https://www.onyphe.io/api/v2/alert/del
 
         :param id_alert: id of alert to delete
+        :type id_alert: str
         :return: dict -- a dictionary with result
         """
         if id_alert:
@@ -375,7 +376,7 @@ class Onyphe:
         """Call API Onyphe https://www.onyphe.io/api/v2/bulk/summary/ip
 
         :param path: path of the files with IPs
-        :type str
+        :type path:str
         :return: dict -- a dictionary with result
         """
         if os.path.isfile(path):
@@ -391,7 +392,7 @@ class Onyphe:
         """Call API Onyphe https://www.onyphe.io/api/v2/bulk/summary/domain
 
          :param path: path of the files with domains
-         :type str
+         :type path:str
          :return: dict -- a dictionary with result
          """
         if os.path.isfile(path):
@@ -407,7 +408,7 @@ class Onyphe:
         """Call API Onyphe https://www.onyphe.io/api/v2/bulk/summary/hostname
 
           :param path: path of the files with hostnames
-          :type str
+          :type path:str
           :return: dict -- a dictionary with result
           """
         if os.path.isfile(path):
@@ -422,7 +423,7 @@ class Onyphe:
     def export(self, query):
         """Call API Onyphe https://www.onyphe.io/api/v2/export/
         :param query: example: category:datascan product:Nginx protocol:http os:Windows tls:true
-        :type str
+        :type query:str
         :return: dict -- a dictionary with result
         """
         return self._prepare_request(quote('/'.join([self.version, 'export',

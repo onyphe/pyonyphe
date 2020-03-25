@@ -2,13 +2,12 @@
 
 onyphe
 ======
-
-..  autoclass::onyphe.client
-	:members:
-
+.. module:: onyphe
+..  autoclass:: Onyphe
+	:inherited-members:
 
 Exceptions
 ~~~~~~~~~~
 
-..  autoexception::onyphe.APIError
+..  autoexception:: onyphe.APIError
 
