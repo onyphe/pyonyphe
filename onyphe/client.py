@@ -1,7 +1,8 @@
 import json
 import logging
+import os
 from urllib.parse import urljoin
-from onyphe.exception import APIError
+from onyphe.exception import APIError, ParamError
 
 """
 onyphe.client
@@ -26,7 +27,7 @@ class Onyphe:
         self.api_key = api_key
         self.base_url = 'https://www.onyphe.io/api/'
         self.version = version
-        self._session = requests.Session()
+        self._session = requests
 
         self.methods = {
             'get': self._session.get,
@@ -36,13 +37,19 @@ class Onyphe:
     def _choose_url(self, uri):
         self.url = urljoin(self.base_url, uri)
 
-    def _request(self, method, payload, json_data):
+    def _request(self, method, payload, json_data, files):
 
         data = None
-
+        session = self.methods[method]
         try:
-            response = self.methods[method](self.url, params=payload,
-                                            data=json.dumps(json_data))
+            if json_data:
+               response = session(self.url, params=payload,
+                                  data=json.dumps(json_data))
+            elif files:
+                payload['Content-Type'] = 'application/json'
+                response = session(self.url, params=payload, data=files)
+            else:
+                response = self.methods[method](self.url, params=payload)
         except:
             raise APIError('Unable to connect to Onyphe')
 
@@ -65,7 +72,9 @@ class Onyphe:
             data = response.json()
 
         except:
+            print(response.content)
             raise APIError('Unable to parse JSON')
+
 
         return data
 
@@ -76,17 +85,21 @@ class Onyphe:
 
         json_data = None
 
+        files = None
+
         if 'page' in kwargs:
             params['page'] = kwargs['page']
 
         if 'json_data' in kwargs:
             json_data = kwargs['json_data']
+        if 'files' in kwargs:
+            files = kwargs['files']
 
         method = kwargs['method']
 
         self._choose_url(uri)
 
-        data = self._request(method, params, json_data)
+        data = self._request(method, params, json_data, files)
         if data:
             return data
 
@@ -343,7 +356,7 @@ class Onyphe:
                                                    'alert/add']),
                                          method='post', json_data=data)
         else:
-            raise APIError('Parameters Invalid')
+            raise ParamError('Parameters Invalid')
 
     def del_alert(self, id_alert):
         """Call API Onyphe https://www.onyphe.io/api/v2/alert/del
@@ -356,4 +369,64 @@ class Onyphe:
                                                    'alert/del', id_alert]),
                                          method='post')
         else:
-            raise APIError('Parameter Invalid')
+            raise ParamError('Parameter Invalid')
+
+    def bulk_summary_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/summary/ip
+
+        :param path: path of the files with IPs
+        :type str
+        :return: dict -- a dictionary with result
+        """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/summary/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+
+    def bulk_summary_domain(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/summary/domain
+
+         :param path: path of the files with domains
+         :type str
+         :return: dict -- a dictionary with result
+         """
+        if os.path.isfile(path):
+
+            file_iocs = open(path,'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/summary/domain']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+
+    def bulk_summary_hostname(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/summary/hostname
+
+          :param path: path of the files with hostnames
+          :type str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/summary/hostname']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+
+    def export(self, query):
+        """Call API Onyphe https://www.onyphe.io/api/v2/export/
+        :param query: example: category:datascan product:Nginx protocol:http os:Windows tls:true
+        :type str
+        :return: dict -- a dictionary with result
+        """
+        return self._prepare_request(quote('/'.join([self.version, 'export',
+                                                     query])),
+                                     method='get')
+
+
