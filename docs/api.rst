@@ -3,8 +3,6 @@
 onyphe
 ======
 
-.. automodule::module:: onyphe
-
 ..  autoclass::onyphe.client
 	:members:
 

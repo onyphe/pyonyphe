@@ -20,7 +20,7 @@ Search Information on an IP
         # Setup the ap
         api = onyphe.Onyphe(API_KEY)
         # Perform the search
-        result = api.ip(ip)
+        result = api.summary_ip(ip)
         print(json.dumps(result))
     except Exception as e:
         print('Error: %s' % e)
