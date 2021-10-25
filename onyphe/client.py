@@ -451,6 +451,213 @@ class Onyphe:
         else:
             raise ParamError('%s is no a file' % path)
 
+    def bulk__simple_ctl_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/ctl/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/ctl/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_datascan_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/datascan/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/datascan/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_datashot_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/datashot/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/datashot/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_geoloc_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/geoloc/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/geoloc/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_inetnum_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/inetnum/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/inetnum/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_pastries_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/pastries/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/pastries/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_resolver_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/resolver/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/resolver/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+
+    def bulk_simple_sniffer_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/sniffer/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/sniffer/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+        
+    def bulk_simple_synscan_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/synscan/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/synscan/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_threatlist_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/threatlist/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/threatlist/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+    
+    def bulk_simple_topsite_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/topsite/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/topsite/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+
+    def bulk_simple_vulnscan_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/vulnscan/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/vulnscan/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
+
+    def bulk_simple_whois_ip(self, path):
+        """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/whois/ip
+
+          :param path: path of the files with IPs
+          :type path:str
+          :return: dict -- a dictionary with result
+          """
+        if os.path.isfile(path):
+
+            file_iocs = open(path, 'rb')
+            return self._prepare_request('/'.join([self.version,
+                                                   'bulk/simple/whois/ip']),
+                                         method='post', files=file_iocs)
+        else:
+            raise ParamError('%s is no a file' % path)
     def export(self, query):
         """Call API Onyphe https://www.onyphe.io/api/v2/export/
         :param query: example: category:datascan product:Nginx protocol:http os:Windows tls:true
