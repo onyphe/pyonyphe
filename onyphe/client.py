@@ -451,7 +451,7 @@ class Onyphe:
         else:
             raise ParamError('%s is no a file' % path)
 
-    def bulk__simple_ctl_ip(self, path):
+    def bulk_simple_ctl_ip(self, path):
         """Call API Onyphe https://www.onyphe.io/api/v2/bulk/simple/ctl/ip
 
           :param path: path of the files with IPs
