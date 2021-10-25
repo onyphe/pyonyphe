@@ -150,14 +150,25 @@ class Onyphe:
             method='get')
 
     def simple_geoloc(self, ip):
-        """Call API Onyphe https://www.onyphe.io/api/v2/simple/synscan/<IP>
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/geoloc/<IP>
 
             :param ip: IPv4 or IPv6 address
             :type ip: str
             :returns: dict -- a dictionary containing the results of synscan of IP
         """
         return self._prepare_request(
-            '/'.join([self.version, 'simple/synscan', ip]), method='get')
+            '/'.join([self.version, 'simple/geoloc', ip]), method='get')
+    
+    def simple_geoloc_best(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/geoloc/best<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of geoloc of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/geoloc/best', ip]), method='get')
+    
 
     def simple_inetnum(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/simple/inetnum/<IP>
@@ -168,7 +179,27 @@ class Onyphe:
         """
         return self._prepare_request(
             '/'.join([self.version, 'simple/inetnum', ip]), method='get')
+    
+    def simple_inetnum_best(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/inetnum/best<IP>
 
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of intenum of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/inetnum/best', ip]), method='get')
+    
+    def simple_threatlist_best(self, ip):
+        """Call API Onyphe https://www.onyphe.io/api/v2/simple/threatlist/best<IP>
+
+            :param ip: IPv4 or IPv6 address
+            :type ip: str
+            :returns: dict -- a dictionary containing the results of threatlist with best API of IP
+        """
+        return self._prepare_request(
+            '/'.join([self.version, 'simple/threatlist/best', ip]), method='get')
+    
     def simple_pastries(self, ip):
         """Call API Onyphe https://www.onyphe.io/api/v2/simple/pastries/<IP>
 
