@@ -714,6 +714,10 @@ class Onyphe:
         :type query:str
         :return: dict -- a dictionary with result
         """
-        return self._prepare_request(
-            quote("/".join([self.version, "export", query])), method="get"
-        )
+        uri = quote("/".join([self.version, "export", query]))
+        params = {"apikey": self.api_key}
+        self._choose_url(uri)
+        s = requests.Session()
+        with s.get(self.url, params=params, stream=True) as r:
+            for line in r.iter_lines():
+                yield line
