@@ -67,14 +67,11 @@ class Onyphe:
 
             raise APIError(error)
         try:
-
             data = response.json()
+            return data
 
         except:
-            print(response.content)
-            raise APIError("Unable to parse JSON")
-
-        return data
+            return response
 
     def _prepare_request(self, uri, **kwargs):
         params = {"apikey": self.api_key}
@@ -430,11 +427,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/summary/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -448,11 +447,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/summary/domain"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -466,11 +467,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/summary/hostname"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -484,11 +487,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
-                "/".join([self.version, "bulk/simple/ctl/ip"]),
+            for line in self._prepare_request(
+                "/".join([self.version, "bulk/simple/clt/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -502,11 +507,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/datascan/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -520,11 +527,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/datashot/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -538,11 +547,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/geoloc/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -556,11 +567,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
-                "/".join([self.version, "bulk/simple/inetnum/ip"]),
+            for line in self._prepare_request(
+                "/".join([self.version, "bulk/simple/inetenum/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -574,11 +587,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/pastries/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -592,11 +607,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/resolver/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -610,11 +627,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/sniffer/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -628,11 +647,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/synscan/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -646,11 +667,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/threatlist/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -664,11 +687,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/topsite/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -682,11 +707,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/vulnscan/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
@@ -700,11 +727,13 @@ class Onyphe:
         if os.path.isfile(path):
 
             file_iocs = open(path, "rb")
-            return self._prepare_request(
+            for line in self._prepare_request(
                 "/".join([self.version, "bulk/simple/whois/ip"]),
                 method="post",
                 files=file_iocs,
-            )
+            ).iter_lines():
+                yield json.loads(line.decode("utf-8"))
+
         else:
             raise ParamError("%s is no a file" % path)
 
