@@ -98,7 +98,7 @@ class Onyphe:
 
     def __search(self, query, endpoint, **kwargs):
         return self._prepare_request(
-            quote("/".join([self.version, "search", endpoint, query])), **kwargs
+            quote("/".join([self.version, "search", query])), **kwargs
         )
 
     def synscan(self, ip):
