@@ -1,0 +1,134 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyonyphe"
+version = "3.0.0"
+description = "Python client and CLI for the ONYPHE Cyber Defense Search Engine"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Sebastien Larinier", email = "slarinier@gmail.com" }]
+keywords = ["onyphe", "osint", "cti", "threat-intelligence", "asm", "search-engine"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Information Technology",
+    "Topic :: Security",
+    "Topic :: Internet",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.28",
+    "pydantic>=2.11",
+    "python-dotenv>=1.1",
+    "rich>=14.0",
+    "typer>=0.16",
+    "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.urls]
+Homepage = "https://github.com/sebdraven/pyonyphe"
+Repository = "https://github.com/sebdraven/pyonyphe"
+Issues = "https://github.com/sebdraven/pyonyphe/issues"
+Changelog = "https://github.com/sebdraven/pyonyphe/blob/main/CHANGELOG.md"
+
+[project.scripts]
+pyonyphe = "pyonyphe.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "pytest-cov>=6.0",
+    "respx>=0.22",
+    "ruff>=0.12",
+    "ty>=0.0.50",
+    "pre-commit>=4.0",
+    "twine>=6.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyonyphe"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "docs", "README.md", "LICENSE", "CHANGELOG.md"]
+
+# ---------------------------------------------------------------------------
+# ruff — lint + format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "PTH",  # flake8-use-pathlib
+    "RUF",  # ruff-specific
+    "ANN",  # flake8-annotations
+    "S",    # flake8-bandit
+]
+ignore = [
+    "ANN401",  # allow typing.Any where the ONYPHE payload is genuinely untyped
+    "S101",    # assert is fine in tests
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN", "S105", "S106"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pyonyphe"]
+
+# ---------------------------------------------------------------------------
+# ty — type checking (Astral)
+# ---------------------------------------------------------------------------
+[tool.ty.environment]
+python-version = "3.10"
+python = ".venv"
+
+[tool.ty.src]
+include = ["src", "tests"]
+
+[tool.ty.terminal]
+error-on-warning = true
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "--strict-markers --strict-config"
+asyncio_mode = "auto"
+markers = [
+    "integration: hits the real ONYPHE API, needs ONYPHE_API_KEY and burns credits (deselect with -m 'not integration')",
+]
+
+[tool.coverage.run]
+source = ["src/pyonyphe"]
+branch = true
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+]
