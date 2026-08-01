@@ -56,6 +56,8 @@ Full rewrite against the current ONYPHE APIv2.
   never resolved.
 - Bare `except:` clauses swallowed everything, including `KeyboardInterrupt`.
 - Bulk methods leaked an open file handle per call.
+- Bulk payloads are normalised to LF endings: an asset list written on Windows
+  used to send carriage returns as part of each value.
 
 ### Removed
 

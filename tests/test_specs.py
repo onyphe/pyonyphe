@@ -88,6 +88,17 @@ def test_bulk_payload_from_file(tmp_path: Path) -> None:
     assert specs.bulk_simple("datascan", path).content == b"1.1.1.1\n8.8.8.8\n"
 
 
+def test_bulk_payload_normalises_crlf() -> None:
+    # A list produced on Windows must not ship carriage returns to ONYPHE.
+    spec = specs.bulk_simple("datascan", b"1.1.1.1\r\n8.8.8.8\r\n")
+    assert spec.content == b"1.1.1.1\n8.8.8.8\n"
+
+
+def test_bulk_payload_normalises_lone_cr() -> None:
+    spec = specs.bulk_simple("datascan", b"1.1.1.1\r8.8.8.8\r")
+    assert spec.content == b"1.1.1.1\n8.8.8.8\n"
+
+
 def test_bulk_payload_rejects_missing_file(tmp_path: Path) -> None:
     with pytest.raises(ParamError):
         specs.bulk_simple("datascan", tmp_path / "nope.txt")

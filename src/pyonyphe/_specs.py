@@ -117,25 +117,35 @@ def _flag(value: bool) -> str:
     return "true" if value else "false"
 
 
+def _normalise_newlines(payload: bytes) -> bytes:
+    """Force LF line endings.
+
+    A list of assets written on Windows carries CRLF, and ONYPHE expects one
+    clean asset per line: a trailing carriage return would otherwise travel as
+    part of the asset value itself.
+    """
+    return payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
 def to_payload(source: str | Path | Iterable[str] | bytes) -> bytes:
     """Normalise a bulk input into the newline-delimited body ONYPHE expects.
 
     :param source: a path to a text file, a raw string, an iterable of assets,
         or already-encoded bytes
-    :returns: UTF-8 bytes, one asset per line
+    :returns: UTF-8 bytes, one asset per line, LF-terminated
     :raises ParamError: when a path is given but does not point to a file
     """
     if isinstance(source, bytes):
-        return source
+        return _normalise_newlines(source)
     if isinstance(source, Path):
         if not source.is_file():
             raise ParamError(f"{source} is not a file")
-        return source.read_bytes()
+        return _normalise_newlines(source.read_bytes())
     if isinstance(source, str):
         candidate = Path(source)
         if candidate.is_file():
-            return candidate.read_bytes()
-        return source.encode("utf-8")
+            return _normalise_newlines(candidate.read_bytes())
+        return _normalise_newlines(source.encode("utf-8"))
     items = [str(item).strip() for item in source]
     items = [item for item in items if item]
     if not items:
