@@ -15,3 +15,10 @@ repos:
       - id: trailing-whitespace
       - id: check-merge-conflict
       - id: detect-private-key
+
+  # Static analysis of the GitHub Actions workflows themselves: template
+  # injection, credential persistence, over-broad permissions, mutable tags.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.28.0
+    hooks:
+      - id: zizmor
