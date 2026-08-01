@@ -53,10 +53,13 @@ dev = [
     "ty>=0.0.50",
     "pre-commit>=4.0",
     "twine>=6.1",
+    # Not needed at runtime on 3.11+, but ty analyses against 3.10 and has to
+    # be able to resolve the fallback import in config.py.
+    "tomli>=2.0",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pyonyphe"]
+packages = ["src/pyonyphe", "src/onyphe"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src", "tests", "docs", "README.md", "LICENSE", "CHANGELOG.md"]
