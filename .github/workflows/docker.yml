@@ -51,8 +51,12 @@ jobs:
         run: |
           docker run --rm pyonyphe:test --version
           docker run --rm pyonyphe:test search --help
-          # The CLI must fail cleanly, not crash, when no key is configured.
-          docker run --rm pyonyphe:test user; test $? -eq 2
+          # The CLI must fail cleanly with exit code 2, not crash, when no key
+          # is configured. `|| status=$?` is required: the step runs under
+          # `set -e`, so a bare non-zero command would abort the script here.
+          status=0
+          docker run --rm pyonyphe:test user || status=$?
+          test "$status" -eq 2
           # And it must not run as root.
           test "$(docker run --rm --entrypoint id pyonyphe:test -u)" = "1000"
 
