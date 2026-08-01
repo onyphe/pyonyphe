@@ -26,7 +26,7 @@ uv run pyonyphe --help
 ```python
 from pyonyphe import Onyphe
 
-with Onyphe() as api:                     # key read from ONYPHE_API_KEY
+with Onyphe() as api:  # key read from ONYPHE_API_KEY
     page = api.search("category:datascan product:Nginx country:FR")
     print(page.total, "results")
 
@@ -43,11 +43,13 @@ Async, same surface:
 import asyncio
 from pyonyphe import AsyncOnyphe
 
+
 async def main() -> None:
     async with AsyncOnyphe() as api:
         page = await api.search("protocol:rdp")
         async for hit in api.export("domain:example.com"):
             print(hit["ip"])
+
 
 asyncio.run(main())
 ```
