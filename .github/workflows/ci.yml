@@ -10,6 +10,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege by default: no job here needs to write anything back.
+permissions:
+  contents: read
+
 env:
   # Fail the build if uv.lock no longer matches pyproject.toml, instead of
   # silently re-resolving.
@@ -42,6 +46,9 @@ jobs:
 
       - name: Type check
         run: uv run ty check
+
+      - name: Audit the workflows
+        run: uv run zizmor --format plain .github/workflows
 
   test:
     name: Tests py${{ matrix.python-version }} on ${{ matrix.os }}
