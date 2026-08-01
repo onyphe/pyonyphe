@@ -106,11 +106,25 @@ docker run --rm -e ONYPHE_API_KEY -v "$PWD:/work" ghcr.io/sebdraven/pyonyphe:lat
   bulk simple datascan ips.txt -o datascan.ndjson
 ```
 
+## MCP server
+
+An optional MCP server exposes ONYPHE to an assistant:
+
+```bash
+uv add 'pyonyphe[mcp]'
+ONYPHE_API_KEY=... pyonyphe-mcp
+```
+
+Four read-only tools — `search`, `summary`, `resolve`, `user` — with clamped
+page sizes and truncated fields, so a model cannot drain your credits or your
+context window. See [docs/mcp.md](docs/mcp.md).
+
 ## Documentation
 
 - [Installation](docs/installation.md)
 - [Usage](docs/usage.md)
 - [CLI reference](docs/cli.md)
+- [MCP server](docs/mcp.md)
 - [API reference](docs/api.md)
 - [Migrating from 2.x](docs/migration.md)
 - [Contributing](CONTRIBUTING.md)

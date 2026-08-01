@@ -32,6 +32,8 @@ Full rewrite against the current ONYPHE APIv2.
   trusted publishing.
 - Container image on GHCR (`linux/amd64` and `linux/arm64`), built on every
   push to `main` and on each release.
+- Optional MCP server (`pyonyphe[mcp]`, command `pyonyphe-mcp`) exposing
+  `search`, `summary`, `resolve` and `user` over stdio.
 - Documentation as markdown in `docs/`.
 
 ### Changed
