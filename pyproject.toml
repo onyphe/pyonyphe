@@ -51,6 +51,7 @@ dev = [
     "respx>=0.22",
     "ruff>=0.12",
     "ty>=0.0.50",
+    "zizmor>=1.28",
     "pre-commit>=4.0",
     "twine>=6.1",
     # Not needed at runtime on 3.11+, but ty analyses against 3.10 and has to
