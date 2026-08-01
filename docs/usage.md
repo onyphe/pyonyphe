@@ -38,11 +38,11 @@ pydantic, with the raw documents left as dictionaries in `results`.
 
 ```python
 page = api.search("category:datascan product:Nginx")
-page.total       # total matching documents
-page.count       # documents in this page
-page.max_page    # last reachable page
-page.results     # list[dict]
-list(page)       # iterating a Response iterates its results
+page.total  # total matching documents
+page.count  # documents in this page
+page.max_page  # last reachable page
+page.results  # list[dict]
+list(page)  # iterating a Response iterates its results
 ```
 
 Unknown fields are preserved, so a new ONYPHE field never breaks the client.

@@ -57,8 +57,8 @@ endpoints that tolerate the legacy shape.
 
 ```python
 response = api.summary_ip("8.8.8.8")
-response.results      # what you used to iterate
-response.model_dump() # a plain dict again, if you really need one
+response.results  # what you used to iterate
+response.model_dump()  # a plain dict again, if you really need one
 ```
 
 Streaming methods still yield plain dicts, one per document.
