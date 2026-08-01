@@ -29,7 +29,9 @@ def test_toml_config(tmp_path: Path) -> None:
 
 
 def test_onyphe_ini_is_read(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # HOME on POSIX, USERPROFILE on Windows -- Path.home() looks at both.
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
     (tmp_path / ".onyphe.ini").write_text(
         "api_endpoint = https://www.onyphe.io/api/v2\napi_key = from-ini\n", encoding="utf-8"
     )

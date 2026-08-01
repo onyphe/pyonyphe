@@ -19,13 +19,19 @@ BASE = "https://www.onyphe.io/api/v2"
 
 @pytest.fixture(autouse=True)
 def _sandbox_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # Path.home() reads HOME on POSIX but USERPROFILE on Windows: set both, or
+    # a real ~/.onyphe.ini leaks into the assertions on one platform only.
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
     monkeypatch.delenv("ONYPHE_API_KEY", raising=False)
     monkeypatch.delenv("ONYPHE_BASE_URL", raising=False)
     monkeypatch.delenv("ONYPHE_UNRATED_EMAIL", raising=False)
     # Run from an empty directory so a developer's .env never leaks in.
     monkeypatch.chdir(tmp_path)
+    # Belt and braces: the CLI loads .env at startup, and a real key sneaking
+    # into a unit test would make it call the live API instead of the mock.
+    monkeypatch.setattr("pyonyphe.cli.load_dotenv", lambda *args, **kwargs: False)
 
 
 @pytest.fixture
