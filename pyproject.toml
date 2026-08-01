@@ -34,6 +34,11 @@ dependencies = [
     "tomli>=2.0; python_version < '3.11'",
 ]
 
+[project.optional-dependencies]
+# SDK v2: `FastMCP` became `MCPServer` and the import paths moved, so the
+# major is pinned rather than left open.
+mcp = ["mcp>=2,<3"]
+
 [project.urls]
 Homepage = "https://github.com/sebdraven/pyonyphe"
 Repository = "https://github.com/sebdraven/pyonyphe"
@@ -42,6 +47,7 @@ Changelog = "https://github.com/sebdraven/pyonyphe/blob/main/CHANGELOG.md"
 
 [project.scripts]
 pyonyphe = "pyonyphe.cli:main"
+pyonyphe-mcp = "pyonyphe.mcp_server:main"
 
 [dependency-groups]
 dev = [
@@ -54,6 +60,8 @@ dev = [
     "zizmor>=1.28",
     "pre-commit>=4.0",
     "twine>=6.1",
+    # The MCP extra, so the server is importable in the test suite.
+    "mcp>=2,<3",
     # Not needed at runtime on 3.11+, but ty analyses against 3.10 and has to
     # be able to resolve the fallback import in config.py.
     "tomli>=2.0",
