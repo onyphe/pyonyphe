@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 
 import httpx
 import pytest
@@ -100,8 +101,7 @@ def test_bulk_simple_posts_the_asset_list(client: Onyphe) -> None:
 @respx.mock
 def test_alerts_are_parsed(client: Onyphe) -> None:
     payload = envelope(
-        [{"id": 0, "name": "My alert", "query": "domain:x", "email": "a@b.tld",
-          "threshold": ">0"}]
+        [{"id": 0, "name": "My alert", "query": "domain:x", "email": "a@b.tld", "threshold": ">0"}]
     )
     respx.get(f"{BASE}/alert/list").mock(return_value=httpx.Response(200, json=payload))
     alerts = client.alerts()
@@ -111,11 +111,15 @@ def test_alerts_are_parsed(client: Onyphe) -> None:
 
 @respx.mock
 def test_add_alert_sends_a_json_body(client: Onyphe) -> None:
-    route = respx.post(f"{BASE}/alert/add").mock(
-        return_value=httpx.Response(200, json=envelope())
-    )
+    route = respx.post(f"{BASE}/alert/add").mock(return_value=httpx.Response(200, json=envelope()))
     client.add_alert("n", "category:vulnscan domain:x", "a@b.tld", ">2")
-    assert b'"threshold": ">2"' in route.calls.last.request.content
+    body = json.loads(route.calls.last.request.content)
+    assert body == {
+        "name": "n",
+        "query": "category:vulnscan domain:x",
+        "email": "a@b.tld",
+        "threshold": ">2",
+    }
 
 
 @respx.mock
