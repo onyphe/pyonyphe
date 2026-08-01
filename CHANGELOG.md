@@ -33,7 +33,8 @@ Full rewrite against the current ONYPHE APIv2.
 
 ### Changed
 
-- **Importable package renamed** `onyphe` to `pyonyphe`.
+- **Importable package renamed** `onyphe` to `pyonyphe`. `import onyphe` still
+  works through a deprecation shim, removed in 4.0.0.
 - Authentication moved from the `apikey` query parameter to the
   `Authorization: bearer` header.
 - `requests` replaced by `httpx`.

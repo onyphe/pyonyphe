@@ -6,12 +6,20 @@ against an API shape ONYPHE no longer serves.
 ## Import name
 
 ```python
-from onyphe import Onyphe, APIError      # 2.x
-from pyonyphe import Onyphe, APIError    # 3.x
+from onyphe import Onyphe, APIError  # 2.x
+from pyonyphe import Onyphe, APIError  # 3.x
 ```
 
 The distribution has always been `pyonyphe`; only the importable package
 changed, so that both match.
+
+`import onyphe` still resolves: a shim re-exports `Onyphe`, `AsyncOnyphe`,
+`OnypheError`, `APIError` and `ParamError` from `pyonyphe` and emits a
+`DeprecationWarning`. It will be removed in 4.0.0.
+
+The shim fixes the *import*, not the *behaviour*: return types and method
+names changed too, so code reached through it will still hit the differences
+listed below. Treat it as a window to port in, not as a compatibility layer.
 
 ## What was actually broken in 2.x
 
