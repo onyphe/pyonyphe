@@ -225,6 +225,9 @@ def search(
         bool, typer.Option("--all", help="Walk every page, up to 10000 results.")
     ] = False,
     limit: Annotated[int | None, typer.Option(help="Stop after N results (implies --all).")] = None,
+    pages: Annotated[
+        int | None, typer.Option(help="Fetch at most N pages (implies --all).")
+    ] = None,
     trackquery: Annotated[bool, typer.Option(help="Report which sub-query matched.")] = False,
     calculated: Annotated[bool, typer.Option(help="Ask for enriched fields.")] = False,
     fmt: Annotated[str, typer.Option("--format", "-f", help="table, json or ndjson.")] = "table",
@@ -233,12 +236,13 @@ def search(
     """Run an OQL search."""
     with get_client() as client:
         try:
-            if all_pages or limit is not None:
+            if all_pages or limit is not None or pages is not None:
                 rows = list(
                     client.search_iter(
                         query,
                         size=size,
                         max_results=limit,
+                        max_pages=pages,
                         trackquery=trackquery,
                         calculated=calculated,
                     )
