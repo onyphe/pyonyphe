@@ -164,21 +164,29 @@ class Onyphe(BaseClient):
         *,
         size: int = 100,
         max_results: int | None = None,
+        max_pages: int | None = None,
         trackquery: bool = False,
         calculated: bool = False,
     ) -> Iterator[dict[str, Any]]:
         """Iterate over every result of a query, walking the pages for you.
 
-        Stops at ``max_results`` when given, and never goes past the 10000
-        results the Search API is willing to serve -- use :meth:`export` beyond
-        that.
+        :param size: results per page, so ``max_pages`` costs at most
+            ``size * max_pages`` documents
+        :param max_results: stop after this many documents
+        :param max_pages: stop after this many API calls, whichever comes first
+
+        Stops at ``max_results`` or ``max_pages`` when given, at the last page
+        ONYPHE reports, and never goes past the 10000 results the Search API is
+        willing to serve -- use :meth:`export` beyond that.
         """
         fetched = 0
+        pages = 0
         page = 1
         while True:
             response = self.search(
                 query, page=page, size=size, trackquery=trackquery, calculated=calculated
             )
+            pages += 1
             if not response.results:
                 return
             for hit in response.results:
@@ -188,6 +196,8 @@ class Onyphe(BaseClient):
                     return
                 if fetched >= SEARCH_MAX_RESULTS:
                     return
+            if max_pages is not None and pages >= max_pages:
+                return
             if response.max_page is not None and page >= response.max_page:
                 return
             page += 1

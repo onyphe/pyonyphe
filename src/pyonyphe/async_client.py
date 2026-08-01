@@ -147,16 +147,23 @@ class AsyncOnyphe(BaseClient):
         *,
         size: int = 100,
         max_results: int | None = None,
+        max_pages: int | None = None,
         trackquery: bool = False,
         calculated: bool = False,
     ) -> AsyncIterator[dict[str, Any]]:
-        """Iterate over every result of a query, walking the pages for you."""
+        """Iterate over every result of a query, walking the pages for you.
+
+        :param max_results: stop after this many documents
+        :param max_pages: stop after this many API calls, whichever comes first
+        """
         fetched = 0
+        pages = 0
         page = 1
         while True:
             response = await self.search(
                 query, page=page, size=size, trackquery=trackquery, calculated=calculated
             )
+            pages += 1
             if not response.results:
                 return
             for hit in response.results:
@@ -166,6 +173,8 @@ class AsyncOnyphe(BaseClient):
                     return
                 if fetched >= SEARCH_MAX_RESULTS:
                     return
+            if max_pages is not None and pages >= max_pages:
+                return
             if response.max_page is not None and page >= response.max_page:
                 return
             page += 1
