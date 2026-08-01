@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pytest
 
 from pyonyphe import _specs as specs
+from pyonyphe._specs import BestCategory, SimpleCategory, SummaryKind
 from pyonyphe.errors import ParamError
 
 
@@ -44,7 +46,7 @@ def test_summary_paths() -> None:
 
 def test_summary_rejects_unknown_kind() -> None:
     with pytest.raises(ParamError):
-        specs.summary("asn", "AS15169")  # type: ignore[arg-type]
+        specs.summary(cast(SummaryKind, "asn"), "AS15169")
 
 
 def test_simple_and_best_paths() -> None:
@@ -55,13 +57,13 @@ def test_simple_and_best_paths() -> None:
 def test_simple_rejects_categories_dropped_by_onyphe() -> None:
     # synscan disappeared from the Simple API; it must not silently 404.
     with pytest.raises(ParamError):
-        specs.simple("synscan", "8.8.8.8")  # type: ignore[arg-type]
+        specs.simple(cast(SimpleCategory, "synscan"), "8.8.8.8")
 
 
 def test_best_is_limited_to_four_categories() -> None:
-    assert specs.BEST_CATEGORIES == {"geoloc", "inetnum", "threatlist", "whois"}
+    assert sorted(specs.BEST_CATEGORIES) == ["geoloc", "inetnum", "threatlist", "whois"]
     with pytest.raises(ParamError):
-        specs.simple_best("datascan", "8.8.8.8")  # type: ignore[arg-type]
+        specs.simple_best(cast(BestCategory, "datascan"), "8.8.8.8")
 
 
 def test_bulk_paths_are_spelled_correctly() -> None:
