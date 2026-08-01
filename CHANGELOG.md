@@ -14,7 +14,8 @@ Full rewrite against the current ONYPHE APIv2.
 - `pyonyphe` CLI (Typer + Rich): `user`, `search`, `export`, `summary`,
   `simple`, `resolve`, `bulk summary|simple|discovery`, `alert list|add|del`,
   `config`.
-- `search_iter()` — automatic pagination up to the API's 10000-result ceiling.
+- `search_iter()` — automatic pagination up to the API's 10000-result ceiling,
+  bounded by `max_results` (documents) or `max_pages` (API calls).
 - `/user` and Discovery endpoints, Simple Best and Bulk Simple Best.
 - Typed exception hierarchy under `OnypheError`, with `RateLimitError`
   exposing `retry_after`.

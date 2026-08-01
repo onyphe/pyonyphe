@@ -62,9 +62,18 @@ for hit in api.search_iter("domain:example.com", size=100, max_results=1000):
     print(hit["ip"])
 ```
 
-`search_iter` stops at `max_results`, at the last page ONYPHE reports, or at
-the 10 000-result ceiling the Search API enforces — whichever comes first.
-Past that ceiling, use `export`.
+`search_iter` stops at `max_results`, at `max_pages`, at the last page ONYPHE
+reports, or at the 10 000-result ceiling the Search API enforces — whichever
+comes first. Past that ceiling, use `export`.
+
+`max_pages` caps the number of API calls rather than the number of documents,
+which is what you want when the budget is credits rather than volume:
+
+```python
+# at most 5 calls, so at most 500 documents
+for hit in api.search_iter("domain:example.com", size=100, max_pages=5):
+    ...
+```
 
 `trackquery=True` asks ONYPHE which sub-query matched each document, and
 `calculated=True` adds the enriched `calculated.*` fields.

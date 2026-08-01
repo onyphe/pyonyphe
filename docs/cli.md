@@ -53,12 +53,14 @@ License, remaining credits, authorised categories, scanned ports.
 | `--size` | results per page (default 100, up to 10000) |
 | `--all` | walk every page, up to the 10000-result API ceiling |
 | `--limit N` | stop after N results, implies `--all` |
+| `--pages N` | fetch at most N pages, implies `--all` |
 | `--trackquery` | report which sub-query matched |
 | `--calculated` | ask for the enriched `calculated.*` fields |
 
 ```bash
 pyonyphe search 'protocol:rdp country:FR' --size 20
 pyonyphe search 'domain:example.com' --limit 500 --format ndjson -o hits.ndjson
+pyonyphe search 'domain:example.com' --pages 5 --size 100   # 5 calls, 500 results max
 ```
 
 ### `export QUERY`

@@ -10,7 +10,7 @@ return an async iterator.
 | --- | --- | --- |
 | `user()` | GET | `/user` |
 | `search(query, page=1, size=None, trackquery=False, calculated=False)` | GET | `/search/?q=...` |
-| `search_iter(query, size=100, max_results=None, ...)` | GET | `/search/`, page by page |
+| `search_iter(query, size=100, max_results=None, max_pages=None, ...)` | GET | `/search/`, page by page |
 | `export(query, trackquery=False, calculated=False)` | GET | `/export/?q=...` (NDJSON) |
 | `summary(kind, value)` | GET | `/summary/{kind}/{value}` |
 | `summary_ip(ip)` | GET | `/summary/ip/{ip}` |
