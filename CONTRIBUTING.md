@@ -60,8 +60,16 @@ never disable a whole family to make one line pass.
 ## Tests
 
 `respx` mocks httpx at the transport level, so no network access is needed.
-`tests/conftest.py` sandboxes `HOME`, which keeps a real `~/.onyphe.ini` from
-leaking into assertions.
+`tests/conftest.py` sandboxes `HOME` and the working directory, which keeps a
+real `~/.onyphe.ini` or a local `.env` from leaking into assertions.
+
+`tests/test_integration.py` is the exception: it calls the real API, is marked
+`integration`, and is skipped unless `ONYPHE_API_KEY` is set.
+
+```bash
+uv run pytest -m 'not integration'   # what CI runs
+uv run pytest -m integration         # real API, consumes credits
+```
 
 Never commit a real API key, not even in a fixture.
 
