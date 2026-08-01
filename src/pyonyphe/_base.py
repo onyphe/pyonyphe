@@ -22,7 +22,7 @@ from .errors import (
 )
 from .models import Response
 
-__all__ = ["BaseClient", "PreparedRequest", "USER_AGENT"]
+__all__ = ["USER_AGENT", "BaseClient", "PreparedRequest"]
 
 USER_AGENT = "pyonyphe/3.0.0 (+https://github.com/sebdraven/pyonyphe)"
 

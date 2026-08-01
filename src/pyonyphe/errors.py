@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 __all__ = [
-    "OnypheError",
-    "ConfigError",
-    "ParamError",
-    "TransportError",
     "APIError",
     "AuthenticationError",
-    "PaymentRequiredError",
+    "ConfigError",
     "NotFoundError",
+    "OnypheError",
+    "ParamError",
+    "PaymentRequiredError",
     "RateLimitError",
     "ServerError",
+    "TransportError",
 ]
 
 

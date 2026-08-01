@@ -27,7 +27,7 @@ if sys.version_info >= (3, 11):
 else:  # pragma: no cover - only exercised on 3.10
     import tomli as tomllib
 
-__all__ = ["Settings", "load_settings", "DEFAULT_BASE_URL", "UNRATED_BASE_URL"]
+__all__ = ["DEFAULT_BASE_URL", "UNRATED_BASE_URL", "Settings", "load_settings"]
 
 DEFAULT_BASE_URL = "https://www.onyphe.io/api/v2"
 UNRATED_BASE_URL = "https://www.onyphe.io/unrated/api/v2"
