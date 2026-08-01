@@ -30,11 +30,14 @@ Resolution order, first hit wins:
 
 1. explicit argument — `Onyphe("KEY")` or `pyonyphe --api-key KEY ...`
 2. environment — `ONYPHE_API_KEY`
-3. a `.env` file, looked up from the working directory upwards (see `.env.example`)
-4. `~/.config/pyonyphe/config.toml` (or `$XDG_CONFIG_HOME/pyonyphe/config.toml`)
-5. `~/.onyphe.ini` — the file the official ONYPHE CLI already uses
+3. `~/.config/pyonyphe/config.toml` (or `$XDG_CONFIG_HOME/pyonyphe/config.toml`)
+4. `~/.onyphe.ini` — the file the official ONYPHE CLI already uses
 
-A real environment variable always beats `.env`; the file only fills gaps.
+**`.env` is a CLI feature, not a library one.** The `pyonyphe` command loads it
+at startup, searching from your working directory upwards, which places it
+right after step 2. The library never touches it: importing `pyonyphe` in your
+own application will not silently populate its environment. If you want that
+behaviour in your code, call `dotenv.load_dotenv()` yourself.
 
 ```toml
 # ~/.config/pyonyphe/config.toml

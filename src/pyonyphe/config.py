@@ -4,11 +4,13 @@ Resolution order, first hit wins:
 
 1. the value passed explicitly to the client or to the CLI (``--api-key``)
 2. the ``ONYPHE_API_KEY`` environment variable
-3. a ``.env`` file, looked up from the current working directory upwards
-4. ``$XDG_CONFIG_HOME/pyonyphe/config.toml`` (defaults to ``~/.config/pyonyphe``)
-5. ``~/.onyphe.ini`` -- the file used by the official ONYPHE CLI, read for convenience
+3. ``$XDG_CONFIG_HOME/pyonyphe/config.toml`` (defaults to ``~/.config/pyonyphe``)
+4. ``~/.onyphe.ini`` -- the file used by the official ONYPHE CLI, read for convenience
 
-Real environment variables always win over ``.env``: the file only fills gaps.
+This module deliberately does **not** read ``.env``: a library has no business
+populating the environment of the process that imports it. The ``pyonyphe``
+command does it at startup, which puts ``.env`` right after step 2 for CLI
+users without affecting anyone embedding the client.
 """
 
 from __future__ import annotations
@@ -17,8 +19,6 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-
-from dotenv import load_dotenv
 
 from .errors import ConfigError
 
@@ -110,9 +110,6 @@ def load_settings(
     :param config_path: override the TOML configuration path (mostly for tests)
     :raises ConfigError: when no API key can be found anywhere
     """
-    # Fills the environment from .env without ever overriding a real variable.
-    load_dotenv(override=False)
-
     files: dict[str, str] = {}
     toml_path = config_path or default_config_path()
     if toml_path.is_file():

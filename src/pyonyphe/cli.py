@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Annotated, Any, cast
 
 import typer
+from dotenv import find_dotenv, load_dotenv
 from rich.console import Console
 from rich.table import Table
 
@@ -176,6 +177,10 @@ def root(
     ] = False,
 ) -> None:
     """Global options shared by every sub-command."""
+    # Load .env from the user's working directory upwards -- usecwd matters:
+    # the default search starts from this file, which would pick up a .env
+    # sitting next to an installed package or in the source checkout.
+    load_dotenv(find_dotenv(usecwd=True), override=False)
     state.api_key = api_key
     state.base_url = base_url
     state.unrated_email = unrated_email
