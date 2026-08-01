@@ -7,7 +7,7 @@ import pytest
 import respx
 
 from pyonyphe import AsyncOnyphe
-from pyonyphe.errors import AuthenticationError, TransportError
+from pyonyphe.errors import AuthenticationError, ServerError, TransportError
 
 from .conftest import API_KEY, BASE, envelope
 
@@ -75,3 +75,26 @@ async def test_transport_failure(async_client: AsyncOnyphe) -> None:
     async with async_client as client:
         with pytest.raises(TransportError):
             await client.user()
+
+
+@respx.mock
+async def test_retries_a_rate_limit_then_succeeds() -> None:
+    route = respx.get(f"{BASE}/user").mock(
+        side_effect=[
+            httpx.Response(429, headers={"Retry-After": "0"}, json={"text": "slow down"}),
+            httpx.Response(200, json=envelope([{"ok": True}])),
+        ]
+    )
+    async with AsyncOnyphe(API_KEY, max_retries=2, backoff=0.0) as client:
+        response = await client.user()
+    assert response.results == [{"ok": True}]
+    assert route.call_count == 2
+
+
+@respx.mock
+async def test_gives_up_after_max_retries() -> None:
+    route = respx.get(f"{BASE}/user").mock(return_value=httpx.Response(503, json={"text": "busy"}))
+    async with AsyncOnyphe(API_KEY, max_retries=2, backoff=0.0) as client:
+        with pytest.raises(ServerError):
+            await client.user()
+    assert route.call_count == 3  # the initial attempt plus two retries
