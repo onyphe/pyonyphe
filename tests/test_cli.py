@@ -78,8 +78,10 @@ def test_api_error_exits_with_1() -> None:
 def test_alert_list() -> None:
     respx.get(f"{BASE}/alert/list").mock(
         return_value=httpx.Response(
-            200, json=envelope([{"id": 1, "name": "n", "query": "q", "email": "a@b.tld",
-                                 "threshold": ">0"}])
+            200,
+            json=envelope(
+                [{"id": 1, "name": "n", "query": "q", "email": "a@b.tld", "threshold": ">0"}]
+            ),
         )
     )
     result = runner.invoke(app, ["--api-key", API_KEY, "alert", "list"])
