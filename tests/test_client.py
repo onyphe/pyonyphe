@@ -82,6 +82,24 @@ def test_search_iter_honours_max_results(client: Onyphe) -> None:
 
 
 @respx.mock
+def test_search_iter_honours_max_pages(client: Onyphe) -> None:
+    route = respx.get(f"{BASE}/search/").mock(
+        return_value=httpx.Response(200, json=envelope([{"n": 1}], max_page=50))
+    )
+    rows = list(client.search_iter("x", size=1, max_pages=3))
+    assert len(rows) == 3
+    assert route.call_count == 3  # three API calls, not fifty
+
+
+@respx.mock
+def test_max_results_wins_when_stricter_than_max_pages(client: Onyphe) -> None:
+    respx.get(f"{BASE}/search/").mock(
+        return_value=httpx.Response(200, json=envelope([{"n": 1}, {"n": 2}], max_page=50))
+    )
+    assert len(list(client.search_iter("x", size=2, max_pages=5, max_results=3))) == 3
+
+
+@respx.mock
 def test_export_yields_ndjson(client: Onyphe) -> None:
     body = '{"ip":"1.1.1.1"}\n\n{"ip":"8.8.8.8"}\n'
     respx.get(f"{BASE}/export/").mock(return_value=httpx.Response(200, text=body))

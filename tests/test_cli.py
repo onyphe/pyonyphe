@@ -41,6 +41,18 @@ def test_search_table() -> None:
 
 
 @respx.mock
+def test_search_pages_option_limits_calls() -> None:
+    route = respx.get(f"{BASE}/search/").mock(
+        return_value=httpx.Response(200, json=envelope([{"ip": "8.8.8.8"}], max_page=50))
+    )
+    result = runner.invoke(
+        app, ["--api-key", API_KEY, "search", "x", "--pages", "5", "--size", "1"]
+    )
+    assert result.exit_code == 0
+    assert route.call_count == 5
+
+
+@respx.mock
 def test_search_json_to_file(tmp_path: Path) -> None:
     respx.get(f"{BASE}/search/").mock(
         return_value=httpx.Response(200, json=envelope([{"ip": "8.8.8.8"}]))

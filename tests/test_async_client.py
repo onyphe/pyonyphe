@@ -39,6 +39,19 @@ async def test_search_iter(async_client: AsyncOnyphe) -> None:
 
 
 @respx.mock
+async def test_search_iter_honours_max_pages(async_client: AsyncOnyphe) -> None:
+    route = respx.get(f"{BASE}/search/").mock(
+        return_value=httpx.Response(200, json=envelope([{"n": 1}], max_page=50))
+    )
+    seen = []
+    async with async_client as client:
+        async for hit in client.search_iter("x", size=1, max_pages=2):
+            seen.append(hit["n"])
+    assert len(seen) == 2
+    assert route.call_count == 2
+
+
+@respx.mock
 async def test_export_streams(async_client: AsyncOnyphe) -> None:
     respx.get(f"{BASE}/export/").mock(
         return_value=httpx.Response(200, text='{"ip":"1.1.1.1"}\n{"ip":"8.8.8.8"}\n')
