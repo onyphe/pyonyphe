@@ -11,13 +11,14 @@ import json
 import sys
 from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any, cast
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from . import __version__
+from ._specs import BestCategory, BulkSimpleCategory, SimpleCategory, SummaryKind
 from .client import Onyphe
 from .config import load_settings
 from .errors import OnypheError
@@ -54,9 +55,9 @@ TABLE_COLUMNS = (
 class State:
     """Options collected on the root command and reused by sub-commands."""
 
-    api_key: Optional[str] = None
-    base_url: Optional[str] = None
-    unrated_email: Optional[str] = None
+    api_key: str | None = None
+    base_url: str | None = None
+    unrated_email: str | None = None
     timeout: float = 30.0
 
 
@@ -77,11 +78,11 @@ def get_client() -> Onyphe:
         raise typer.Exit(code=2) from exc
 
 
-def _sink(output: Optional[Path]) -> Any:
+def _sink(output: Path | None) -> Any:
     return output.open("w", encoding="utf-8") if output else sys.stdout
 
 
-def emit_ndjson(rows: Iterable[dict[str, Any]], output: Optional[Path]) -> int:
+def emit_ndjson(rows: Iterable[dict[str, Any]], output: Path | None) -> int:
     """Write results as newline-delimited JSON. Returns the number of rows."""
     handle = _sink(output)
     count = 0
@@ -95,7 +96,7 @@ def emit_ndjson(rows: Iterable[dict[str, Any]], output: Optional[Path]) -> int:
     return count
 
 
-def emit_json(payload: Any, output: Optional[Path]) -> None:
+def emit_json(payload: Any, output: Path | None) -> None:
     """Write a single JSON document, pretty-printed."""
     handle = _sink(output)
     try:
@@ -129,7 +130,7 @@ def _cell(value: Any) -> str:
     return str(value)
 
 
-def render(rows: list[dict[str, Any]], fmt: str, output: Optional[Path], title: str = "") -> None:
+def render(rows: list[dict[str, Any]], fmt: str, output: Path | None, title: str = "") -> None:
     """Dispatch to the requested output format."""
     if fmt == "table":
         emit_table(rows, title)
@@ -139,7 +140,7 @@ def render(rows: list[dict[str, Any]], fmt: str, output: Optional[Path], title: 
         emit_json(rows, output)
 
 
-def run(rows: Iterator[dict[str, Any]], output: Optional[Path]) -> None:
+def run(rows: Iterator[dict[str, Any]], output: Path | None) -> None:
     """Consume a streaming endpoint, reporting progress on stderr."""
     count = emit_ndjson(rows, output)
     err.print(f"[dim]{count} document(s)[/dim]")
@@ -154,14 +155,14 @@ def _version_callback(value: bool) -> None:
 @app.callback()
 def root(
     api_key: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--api-key", "-k", envvar="ONYPHE_API_KEY", help="ONYPHE API key."),
     ] = None,
     base_url: Annotated[
-        Optional[str], typer.Option("--base-url", envvar="ONYPHE_BASE_URL", help="API root.")
+        str | None, typer.Option("--base-url", envvar="ONYPHE_BASE_URL", help="API root.")
     ] = None,
     unrated_email: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "--unrated-email",
             envvar="ONYPHE_UNRATED_EMAIL",
@@ -185,13 +186,15 @@ def root(
 def config() -> None:
     """Show which endpoint and key would be used, without calling the API."""
     try:
-        settings = load_settings(state.api_key, base_url=state.base_url,
-                                 unrated_email=state.unrated_email)
+        settings = load_settings(
+            state.api_key, base_url=state.base_url, unrated_email=state.unrated_email
+        )
     except OnypheError as exc:
         err.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=2) from exc
-    masked = settings.api_key[:4] + "…" + settings.api_key[-4:] if len(
-        settings.api_key) > 8 else "…"
+    masked = (
+        settings.api_key[:4] + "…" + settings.api_key[-4:] if len(settings.api_key) > 8 else "…"
+    )
     table = Table(header_style="bold")
     table.add_column("setting")
     table.add_column("value")
@@ -216,15 +219,11 @@ def search(
     all_pages: Annotated[
         bool, typer.Option("--all", help="Walk every page, up to 10000 results.")
     ] = False,
-    limit: Annotated[
-        Optional[int], typer.Option(help="Stop after N results (implies --all).")
-    ] = None,
+    limit: Annotated[int | None, typer.Option(help="Stop after N results (implies --all).")] = None,
     trackquery: Annotated[bool, typer.Option(help="Report which sub-query matched.")] = False,
     calculated: Annotated[bool, typer.Option(help="Ask for enriched fields.")] = False,
-    fmt: Annotated[
-        str, typer.Option("--format", "-f", help="table, json or ndjson.")
-    ] = "table",
-    output: Annotated[Optional[Path], typer.Option("--output", "-o", help="Write to a file.")] = None,
+    fmt: Annotated[str, typer.Option("--format", "-f", help="table, json or ndjson.")] = "table",
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Write to a file.")] = None,
 ) -> None:
     """Run an OQL search."""
     with get_client() as client:
@@ -257,7 +256,7 @@ def export(
     query: Annotated[str, typer.Argument(help="ONYPHE Query Language expression.")],
     trackquery: Annotated[bool, typer.Option(help="Report which sub-query matched.")] = False,
     calculated: Annotated[bool, typer.Option(help="Ask for enriched fields.")] = False,
-    output: Annotated[Optional[Path], typer.Option("--output", "-o", help="Write to a file.")] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o", help="Write to a file.")] = None,
 ) -> None:
     """Stream a full export as newline-delimited JSON."""
     with get_client() as client:
@@ -273,12 +272,14 @@ def summary(
     kind: Annotated[str, typer.Argument(help="ip, domain or hostname.")],
     value: Annotated[str, typer.Argument(help="The asset to summarise.")],
     fmt: Annotated[str, typer.Option("--format", "-f", help="table, json or ndjson.")] = "json",
-    output: Annotated[Optional[Path], typer.Option("--output", "-o")] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
 ) -> None:
     """Summary API for an IP, a domain or a hostname."""
     with get_client() as client:
         try:
-            response = client.summary(kind, value)  # type: ignore[arg-type]
+            # Widening a free-form CLI string: _specs validates it and raises
+            # ParamError on anything unknown, which we turn into exit code 1.
+            response = client.summary(cast(SummaryKind, kind), value)
         except OnypheError as exc:
             err.print(f"[red]{exc}[/red]")
             raise typer.Exit(code=1) from exc
@@ -291,15 +292,15 @@ def simple(
     value: Annotated[str, typer.Argument(help="IP, domain, hostname or string.")],
     best: Annotated[bool, typer.Option("--best", help="Best-matching document only.")] = False,
     fmt: Annotated[str, typer.Option("--format", "-f", help="table, json or ndjson.")] = "table",
-    output: Annotated[Optional[Path], typer.Option("--output", "-o")] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
 ) -> None:
     """Simple API (deprecated upstream, kept while it still answers)."""
     with get_client() as client:
         try:
             response = (
-                client.simple_best(category, value)  # type: ignore[arg-type]
+                client.simple_best(cast(BestCategory, category), value)
                 if best
-                else client.simple(category, value)  # type: ignore[arg-type]
+                else client.simple(cast(SimpleCategory, category), value)
             )
         except OnypheError as exc:
             err.print(f"[red]{exc}[/red]")
@@ -327,12 +328,12 @@ def resolve(
 def bulk_summary(
     kind: Annotated[str, typer.Argument(help="ip, domain or hostname.")],
     file: Annotated[Path, typer.Argument(help="One asset per line.")],
-    output: Annotated[Optional[Path], typer.Option("--output", "-o")] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
 ) -> None:
     """Bulk Summary API."""
     with get_client() as client:
         try:
-            run(client.bulk_summary(kind, file), output)  # type: ignore[arg-type]
+            run(client.bulk_summary(cast(SummaryKind, kind), file), output)
         except OnypheError as exc:
             err.print(f"[red]{exc}[/red]")
             raise typer.Exit(code=1) from exc
@@ -343,15 +344,15 @@ def bulk_simple(
     category: Annotated[str, typer.Argument(help="datascan, geoloc, vulnscan, ...")],
     file: Annotated[Path, typer.Argument(help="One IP address per line.")],
     best: Annotated[bool, typer.Option("--best", help="Best-matching document only.")] = False,
-    output: Annotated[Optional[Path], typer.Option("--output", "-o")] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
 ) -> None:
     """Bulk Simple API over a list of IP addresses."""
     with get_client() as client:
         try:
             rows = (
-                client.bulk_simple_best(category, file)  # type: ignore[arg-type]
+                client.bulk_simple_best(cast(BestCategory, category), file)
                 if best
-                else client.bulk_simple(category, file)  # type: ignore[arg-type]
+                else client.bulk_simple(cast(BulkSimpleCategory, category), file)
             )
             run(rows, output)
         except OnypheError as exc:
@@ -363,7 +364,7 @@ def bulk_simple(
 def bulk_discovery(
     category: Annotated[str, typer.Argument(help="Category to query, e.g. datascan.")],
     file: Annotated[Path, typer.Argument(help="One OQL query per line.")],
-    output: Annotated[Optional[Path], typer.Option("--output", "-o")] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
 ) -> None:
     """Discovery API: several OQL queries at once (Griffin View only)."""
     with get_client() as client:
@@ -391,8 +392,11 @@ def alert_list() -> None:
         table.add_column(column, overflow="fold")
     for alert in alerts:
         table.add_row(
-            str(alert.id or ""), alert.name or "", alert.query or "",
-            alert.email or "", alert.threshold or "",
+            str(alert.id or ""),
+            alert.name or "",
+            alert.query or "",
+            alert.email or "",
+            alert.threshold or "",
         )
     out.print(table)
 
