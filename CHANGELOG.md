@@ -30,6 +30,8 @@ Full rewrite against the current ONYPHE APIv2.
 - Support for a `.env` file (`python-dotenv`), see `.env.example`.
 - CI on Linux/macOS/Windows for Python 3.10-3.13, PyPI release through
   trusted publishing.
+- Container image on GHCR (`linux/amd64` and `linux/arm64`), built on every
+  push to `main` and on each release.
 - Documentation as markdown in `docs/`.
 
 ### Changed

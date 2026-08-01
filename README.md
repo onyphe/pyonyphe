@@ -85,6 +85,27 @@ The API key is resolved in this order:
 api_key = "..."
 ```
 
+## Docker
+
+The CLI is published as a container image on GHCR, built for `linux/amd64`
+and `linux/arm64`:
+
+```bash
+docker run --rm -e ONYPHE_API_KEY ghcr.io/sebdraven/pyonyphe:latest \
+  search 'category:datascan product:Nginx country:FR' --size 5
+```
+
+Tags: `latest` and the semver ones (`3`, `3.0`, `3.0.0`) on each release,
+`main` and `sha-<commit>` on every push to the default branch.
+
+The image runs as an unprivileged user and its working directory is `/work`,
+so mount there to read an asset list or write an export:
+
+```bash
+docker run --rm -e ONYPHE_API_KEY -v "$PWD:/work" ghcr.io/sebdraven/pyonyphe:latest \
+  bulk simple datascan ips.txt -o datascan.ndjson
+```
+
 ## Documentation
 
 - [Installation](docs/installation.md)
