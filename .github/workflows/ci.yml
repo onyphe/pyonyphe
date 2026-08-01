@@ -11,7 +11,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  UV_FROZEN: "0"
+  # Fail the build if uv.lock no longer matches pyproject.toml, instead of
+  # silently re-resolving.
+  UV_FROZEN: "1"
 
 jobs:
   lint:
