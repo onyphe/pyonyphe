@@ -15,6 +15,7 @@ uv run ruff check .          # lint
 uv run ruff check --fix .    # lint, autofixing what is safe
 uv run ruff format .         # format
 uv run ty check              # types
+uv run zizmor .github/workflows  # audit the CI workflows
 uv run pytest                # tests
 uv run pytest --cov          # tests with coverage
 ```
@@ -38,6 +39,21 @@ It runs in three places, and all three must agree:
 If a rule genuinely does not fit, silence it narrowly with a `# noqa: RULE`
 and a reason, or add it to `ignore` / `per-file-ignores` with a comment --
 never disable a whole family to make one line pass.
+
+## Workflow security
+
+`zizmor` statically analyses `.github/workflows` for the failure modes specific
+to GitHub Actions: template injection, credentials left behind by `checkout`,
+over-broad `permissions`, mutable action tags. It runs locally, as a
+pre-commit hook, and in the `lint` job.
+
+Two conventions the workflows follow, both enforced by it:
+
+- `permissions: contents: read` at the top of each file, raised per job only
+  where genuinely needed (`id-token: write` for trusted publishing,
+  `contents: write` to create the release).
+- `persist-credentials: false` on every `checkout`, so the job token is not
+  written into `.git/config` where any later step could read it.
 
 ## Design notes
 
