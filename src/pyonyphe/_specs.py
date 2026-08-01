@@ -226,17 +226,13 @@ def bulk_summary(kind: SummaryKind, source: str | Path | Iterable[str] | bytes) 
     return Spec("POST", f"bulk/summary/{kind}", content=to_payload(source), stream=True)
 
 
-def bulk_simple(
-    category: BulkSimpleCategory, source: str | Path | Iterable[str] | bytes
-) -> Spec:
+def bulk_simple(category: BulkSimpleCategory, source: str | Path | Iterable[str] | bytes) -> Spec:
     """Bulk Simple API for a list of IP addresses."""
     _check(category, BULK_SIMPLE_CATEGORIES, "bulk simple category")
     return Spec("POST", f"bulk/simple/{category}/ip", content=to_payload(source), stream=True)
 
 
-def bulk_simple_best(
-    category: BestCategory, source: str | Path | Iterable[str] | bytes
-) -> Spec:
+def bulk_simple_best(category: BestCategory, source: str | Path | Iterable[str] | bytes) -> Spec:
     """Bulk Simple Best API for a list of IP addresses."""
     _check(category, BEST_CATEGORIES, "best category")
     return Spec("POST", f"bulk/simple/{category}/best/ip", content=to_payload(source), stream=True)
@@ -244,9 +240,7 @@ def bulk_simple_best(
 
 def discovery(category: str, source: str | Path | Iterable[str] | bytes) -> Spec:
     """Discovery API: run several OQL queries at once against one category."""
-    return Spec(
-        "POST", f"bulk/discovery/{category}/asset", content=to_payload(source), stream=True
-    )
+    return Spec("POST", f"bulk/discovery/{category}/asset", content=to_payload(source), stream=True)
 
 
 # --------------------------------------------------------------------------

@@ -131,14 +131,17 @@ class BaseClient:
             return
         message = str(payload.get("text") or payload.get("message") or response.reason_phrase)
         if status in (401, 403):
-            raise AuthenticationError(message or "access forbidden", status_code=status,
-                                      payload=payload)
+            raise AuthenticationError(
+                message or "access forbidden", status_code=status, payload=payload
+            )
         if status == 402:
-            raise PaymentRequiredError(message or "payment required", status_code=status,
-                                       payload=payload)
+            raise PaymentRequiredError(
+                message or "payment required", status_code=status, payload=payload
+            )
         if status == 404:
-            raise NotFoundError(message or f"not found: {response.url}", status_code=status,
-                                payload=payload)
+            raise NotFoundError(
+                message or f"not found: {response.url}", status_code=status, payload=payload
+            )
         if status == 429:
             retry_after = response.headers.get("Retry-After")
             raise RateLimitError(
@@ -148,8 +151,7 @@ class BaseClient:
                 retry_after=float(retry_after) if retry_after and retry_after.isdigit() else None,
             )
         if status >= 500:
-            raise ServerError(message or "onyphe server error", status_code=status,
-                              payload=payload)
+            raise ServerError(message or "onyphe server error", status_code=status, payload=payload)
         raise APIError(message or "unknown error", status_code=status, payload=payload)
 
     def to_response(self, response: httpx.Response) -> Response:

@@ -155,9 +155,7 @@ class Onyphe(BaseClient):
         :param calculated: ask ONYPHE for the enriched ``calculated`` fields
         """
         return self.send(
-            specs.search(
-                query, page=page, size=size, trackquery=trackquery, calculated=calculated
-            )
+            specs.search(query, page=page, size=size, trackquery=trackquery, calculated=calculated)
         )
 
     def search_iter(

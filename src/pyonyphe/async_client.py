@@ -138,9 +138,7 @@ class AsyncOnyphe(BaseClient):
     ) -> Response:
         """Run an OQL query and return a single page of results."""
         return await self.send(
-            specs.search(
-                query, page=page, size=size, trackquery=trackquery, calculated=calculated
-            )
+            specs.search(query, page=page, size=size, trackquery=trackquery, calculated=calculated)
         )
 
     async def search_iter(
@@ -243,9 +241,7 @@ class AsyncOnyphe(BaseClient):
         response = await self.send(specs.alert_list())
         return [Alert.model_validate(item) for item in response.results]
 
-    async def add_alert(
-        self, name: str, query: str, email: str, threshold: str = ">0"
-    ) -> Response:
+    async def add_alert(self, name: str, query: str, email: str, threshold: str = ">0") -> Response:
         """Create an alert triggered when the daily count matches ``threshold``."""
         return await self.send(specs.alert_add(name, query, email, threshold))
 

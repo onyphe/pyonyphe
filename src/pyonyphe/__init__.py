@@ -1,8 +1,8 @@
 """Modern Python client and CLI for the ONYPHE Cyber Defense Search Engine.
 
-    >>> from pyonyphe import Onyphe                    # doctest: +SKIP
-    >>> with Onyphe() as api:                          # doctest: +SKIP
-    ...     summary = api.summary_ip("8.8.8.8")
+>>> from pyonyphe import Onyphe                    # doctest: +SKIP
+>>> with Onyphe() as api:                          # doctest: +SKIP
+...     summary = api.summary_ip("8.8.8.8")
 """
 
 from __future__ import annotations
