@@ -1,8 +1,8 @@
 # pyonyphe
 
 [![CI](https://github.com/onyphe/pyonyphe/actions/workflows/ci.yml/badge.svg)](https://github.com/onyphe/pyonyphe/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/pyonyphe.svg)](https://pypi.org/project/pyonyphe/)
-[![Python](https://img.shields.io/pypi/pyversions/pyonyphe.svg)](https://pypi.org/project/pyonyphe/)
+[![PyPI](https://img.shields.io/pypi/v/pyonyphe)](https://pypi.org/project/pyonyphe/)
+[![Python](https://img.shields.io/pypi/pyversions/pyonyphe)](https://pypi.org/project/pyonyphe/)
 
 Python client and command line interface for [ONYPHE](https://www.onyphe.io),
 the Cyber Defense Search Engine.
