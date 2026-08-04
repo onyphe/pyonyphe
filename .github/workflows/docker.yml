@@ -60,6 +60,8 @@ jobs:
           load: true
           push: false
           tags: pyonyphe:test
+          build-args: |
+            HATCH_VCS_PRETEND_VERSION=${{ steps.version.outputs.value }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -108,5 +110,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            HATCH_VCS_PRETEND_VERSION=${{ steps.version.outputs.value }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
