@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.2] - 2026-08-04
+
+### Fixed
+
+- The Docker build failed since 3.0.1: hatch-vcs delegates to setuptools-scm,
+  which reads its own `SETUPTOOLS_SCM_PRETEND_VERSION*` variables, so the
+  injected version was ignored inside the build context where `.git` is
+  absent. No 3.0.1 image was published as a result.
+
 ## [3.0.1] - 2026-08-04
 
 ### Fixed
