@@ -23,12 +23,14 @@ ENV UV_COMPILE_BYTECODE=1 \
 WORKDIR /app
 
 # Dependencies first: this layer is cached until pyproject.toml or uv.lock move.
+# --extra cli is required since 3.1.0: typer and rich moved out of the runtime
+# dependencies, and the image exists to ship the CLI.
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project
+RUN uv sync --frozen --no-dev --no-install-project --extra cli
 
 COPY README.md LICENSE ./
 COPY src ./src
-RUN uv sync --frozen --no-dev --no-editable
+RUN uv sync --frozen --no-dev --no-editable --extra cli
 
 
 FROM python:3.13-slim-bookworm

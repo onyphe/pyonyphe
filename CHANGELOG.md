@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-08-04
+
+### Changed
+
+- **Breaking for CLI users.** `typer` and `rich` moved out of the runtime
+  dependencies into a new `cli` extra. Only the CLI module imports them, but
+  declaring them at runtime forced `rich>=14` onto every project that merely
+  imported the client, which made pyonyphe unresolvable alongside pins such as
+  `censys==2.0.9` (`rich<11`).
+
+  Installing the library is unchanged. To get the `pyonyphe` command, install
+  the extra:
+
+  ```
+  uv add 'pyonyphe[cli]'
+  ```
+
+  Without it, importing `pyonyphe` still works; running `pyonyphe` fails with
+  `ModuleNotFoundError: typer`. The published container image is unaffected —
+  it installs the extra.
+
 ## [3.0.2] - 2026-08-04
 
 ### Fixed

@@ -16,10 +16,21 @@ the Cyber Defense Search Engine.
 
 ## Install
 
+The library on its own:
+
 ```bash
 uv add pyonyphe
+```
+
+The `pyonyphe` command needs the `cli` extra, which pulls in Typer and Rich:
+
+```bash
+uv add 'pyonyphe[cli]'
 uv run pyonyphe --help
 ```
+
+Since 3.1.0 those two are no longer runtime dependencies, so importing the
+client no longer constrains `rich` in your own resolution.
 
 ## Library
 
@@ -55,6 +66,8 @@ asyncio.run(main())
 ```
 
 ## CLI
+
+Needs `uv add 'pyonyphe[cli]'`, or use the container image below.
 
 ```bash
 export ONYPHE_API_KEY=...
