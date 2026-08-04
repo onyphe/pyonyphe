@@ -91,7 +91,17 @@ Never commit a real API key, not even in a fixture.
 
 ## Releasing
 
-1. Update `CHANGELOG.md` and the `version` field in `pyproject.toml`.
-2. Tag: `git tag vX.Y.Z && git push --tags`.
+1. Update `CHANGELOG.md`.
+2. Tag: `git tag vX.Y.Z && git push upstream vX.Y.Z`.
 3. `release.yml` runs the tests, builds, and publishes to PyPI through trusted
    publishing (OIDC — no token stored in the repository).
+
+The version is **not** written in `pyproject.toml`: `hatch-vcs` derives it from
+the tag. `v3.0.1` builds `3.0.1`, `v3.1.0rc1` builds a real pre-release. Two
+consequences worth remembering:
+
+- Every `checkout` in the workflows uses `fetch-depth: 0`. A shallow clone has
+  no tags, and the build would silently produce a bogus version.
+- The Docker build context excludes `.git`, so the version is injected through
+  the `HATCH_VCS_PRETEND_VERSION` build argument. A local `docker build`
+  without that argument produces `0.0.0.dev0`, which is expected.

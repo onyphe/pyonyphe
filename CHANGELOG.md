@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2026-08-04
+
+### Fixed
+
+- Project URLs pointed at the fork instead of `onyphe/pyonyphe`, so the PyPI
+  page linked to the wrong repository. Same for the GHCR image label and the
+  README badges and examples.
+
+### Changed
+
+- The version is now derived from the Git tag (`hatch-vcs`) instead of being
+  hardcoded in `pyproject.toml`. Tagging `v3.1.0rc1` now really produces a
+  `3.1.0rc1` pre-release; previously the tag name had no effect on the
+  published version.
+
 ## [3.0.0] - 2026-08-04
 
 Full rewrite against the current ONYPHE APIv2.
