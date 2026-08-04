@@ -6,6 +6,12 @@
 
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
 
+# hatch-vcs reads the version from Git, and .git is deliberately absent from
+# the build context. The version is injected instead: the CI passes the tag,
+# and a local `docker build` falls back to the placeholder below.
+ARG HATCH_VCS_PRETEND_VERSION=0.0.0.dev0
+ENV HATCH_VCS_PRETEND_VERSION=${HATCH_VCS_PRETEND_VERSION}
+
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=never
