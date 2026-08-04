@@ -40,10 +40,10 @@ dependencies = [
 mcp = ["mcp>=2,<3"]
 
 [project.urls]
-Homepage = "https://github.com/sebdraven/pyonyphe"
-Repository = "https://github.com/sebdraven/pyonyphe"
-Issues = "https://github.com/sebdraven/pyonyphe/issues"
-Changelog = "https://github.com/sebdraven/pyonyphe/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/onyphe/pyonyphe"
+Repository = "https://github.com/onyphe/pyonyphe"
+Issues = "https://github.com/onyphe/pyonyphe/issues"
+Changelog = "https://github.com/onyphe/pyonyphe/blob/master/CHANGELOG.md"
 
 [project.scripts]
 pyonyphe = "pyonyphe.cli:main"

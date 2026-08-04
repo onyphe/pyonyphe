@@ -23,7 +23,7 @@ RUN uv sync --frozen --no-dev --no-editable
 
 FROM python:3.13-slim-bookworm
 
-LABEL org.opencontainers.image.source="https://github.com/sebdraven/pyonyphe" \
+LABEL org.opencontainers.image.source="https://github.com/onyphe/pyonyphe" \
       org.opencontainers.image.description="CLI for the ONYPHE Cyber Defense Search Engine" \
       org.opencontainers.image.licenses="MIT"
 

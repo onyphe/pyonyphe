@@ -1,6 +1,6 @@
 # pyonyphe
 
-[![CI](https://github.com/sebdraven/pyonyphe/actions/workflows/ci.yml/badge.svg)](https://github.com/sebdraven/pyonyphe/actions/workflows/ci.yml)
+[![CI](https://github.com/onyphe/pyonyphe/actions/workflows/ci.yml/badge.svg)](https://github.com/onyphe/pyonyphe/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/pyonyphe.svg)](https://pypi.org/project/pyonyphe/)
 [![Python](https://img.shields.io/pypi/pyversions/pyonyphe.svg)](https://pypi.org/project/pyonyphe/)
 
@@ -91,7 +91,7 @@ The CLI is published as a container image on GHCR, built for `linux/amd64`
 and `linux/arm64`:
 
 ```bash
-docker run --rm -e ONYPHE_API_KEY ghcr.io/sebdraven/pyonyphe:latest \
+docker run --rm -e ONYPHE_API_KEY ghcr.io/onyphe/pyonyphe:latest \
   search 'category:datascan product:Nginx country:FR' --size 5
 ```
 
@@ -102,7 +102,7 @@ The image runs as an unprivileged user and its working directory is `/work`,
 so mount there to read an asset list or write an export:
 
 ```bash
-docker run --rm -e ONYPHE_API_KEY -v "$PWD:/work" ghcr.io/sebdraven/pyonyphe:latest \
+docker run --rm -e ONYPHE_API_KEY -v "$PWD:/work" ghcr.io/onyphe/pyonyphe:latest \
   bulk simple datascan ips.txt -o datascan.ndjson
 ```
 
