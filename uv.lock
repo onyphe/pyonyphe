@@ -1048,12 +1048,14 @@ dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
     { name = "python-dotenv" },
-    { name = "rich" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
-    { name = "typer" },
 ]
 
 [package.optional-dependencies]
+cli = [
+    { name = "rich" },
+    { name = "typer" },
+]
 mcp = [
     { name = "mcp" },
 ]
@@ -1066,10 +1068,12 @@ dev = [
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "respx" },
+    { name = "rich" },
     { name = "ruff" },
     { name = "tomli" },
     { name = "twine" },
     { name = "ty" },
+    { name = "typer" },
     { name = "zizmor" },
 ]
 
@@ -1079,11 +1083,11 @@ requires-dist = [
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=2,<3" },
     { name = "pydantic", specifier = ">=2.11" },
     { name = "python-dotenv", specifier = ">=1.1" },
-    { name = "rich", specifier = ">=14.0" },
+    { name = "rich", marker = "extra == 'cli'", specifier = ">=14.0" },
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0" },
-    { name = "typer", specifier = ">=0.16" },
+    { name = "typer", marker = "extra == 'cli'", specifier = ">=0.16" },
 ]
-provides-extras = ["mcp"]
+provides-extras = ["cli", "mcp"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1093,10 +1097,12 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=0.25" },
     { name = "pytest-cov", specifier = ">=6.0" },
     { name = "respx", specifier = ">=0.22" },
+    { name = "rich", specifier = ">=14.0" },
     { name = "ruff", specifier = ">=0.12" },
     { name = "tomli", specifier = ">=2.0" },
     { name = "twine", specifier = ">=6.1" },
     { name = "ty", specifier = ">=0.0.50" },
+    { name = "typer", specifier = ">=0.16" },
     { name = "zizmor", specifier = ">=1.28" },
 ]
 
