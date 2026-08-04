@@ -6,6 +6,25 @@ updates:
       interval: monthly
     commit-message:
       prefix: "ci"
+    groups:
+      # upload-artifact and download-artifact must move together: mixing
+      # majors between the job that uploads and the one that downloads breaks
+      # the handover, which is what the v3 -> v4 change did.
+      artifacts:
+        patterns:
+          - "actions/upload-artifact"
+          - "actions/download-artifact"
+      # The docker/* actions are released in lockstep and used in one job.
+      docker:
+        patterns:
+          - "docker/*"
+      # Everything else, minor and patch only, in a single PR.
+      actions-minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: uv
     directory: /
@@ -13,3 +32,10 @@ updates:
       interval: monthly
     commit-message:
       prefix: "deps"
+    groups:
+      python-minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
