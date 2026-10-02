@@ -4,6 +4,31 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.1] - 2026-10-02
+
+No change to the library code or to the constraints in `pyproject.toml`: the
+wheel and sdist are functionally identical to 3.1.0. This release exists to
+rebuild the container image tags (`latest`, `3`, `3.1`, `3.1.1`) against the
+refreshed lockfile.
+
+### Security
+
+- `urllib3` 2.7.0 → 2.8.0 in the lockfile: fixes GHSA-8988-9cw3-xx77 (HTTPS
+  proxy TLS configuration ignored or overridden), GHSA-vxq7-64xx-v4gw
+  (unbounded chunk-size line buffering) and GHSA-gh4c-6fx4-qh6g (infinite loop
+  in chunked Deflate streaming).
+- `pyjwt` 2.13.0 → 2.15.0 in the lockfile: deeply nested payloads now raise
+  `DecodeError` instead of a raw `RecursionError`.
+
+### Changed
+
+- Locked dependencies refreshed: `httpx2` and `httpcore2` 2.12.0, `mcp` 2.1.1,
+  `pydantic` 2.13.5, `python-dotenv` 1.2.3, `typer` 0.27.2, `virtualenv`
+  21.7.13; dev tools `ruff` 0.16.5, `ty` 0.0.75, `zizmor` 1.29.0,
+  `pre-commit` 4.6.2.
+- CI: `astral-sh/setup-uv` v10, `docker/setup-qemu-action` v4.4.0,
+  `docker/setup-buildx-action` v4.4.1, `docker/build-push-action` v7.4.0.
+
 ## [3.1.0] - 2026-08-04
 
 ### Changed
