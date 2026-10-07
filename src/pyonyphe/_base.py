@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import base64
 import json as jsonlib
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -13,11 +14,13 @@ import httpx
 from ._specs import Spec
 from .config import Settings, load_settings
 from .errors import (
+    SCAN_IN_PROGRESS_CODES,
     APIError,
     AuthenticationError,
     NotFoundError,
     PaymentRequiredError,
     RateLimitError,
+    ScanInProgressError,
     ServerError,
 )
 from .models import Response
@@ -153,6 +156,27 @@ class BaseClient:
         if status >= 500:
             raise ServerError(message or "onyphe server error", status_code=status, payload=payload)
         raise APIError(message or "unknown error", status_code=status, payload=payload)
+
+    def raise_for_scan(
+        self,
+        scan_id: str,
+        payload: Mapping[str, Any],
+        *,
+        status_code: int | None = None,
+    ) -> None:
+        """Tell a pending On-demand scan apart from a genuine failure.
+
+        :param payload: decoded body, successful or not
+        :raises ScanInProgressError: when ONYPHE reported code 103 or 111
+        """
+        code = payload.get("error")
+        if isinstance(code, int) and code in SCAN_IN_PROGRESS_CODES:
+            raise ScanInProgressError(
+                str(payload.get("text") or "scan in progress"),
+                scan_id=scan_id,
+                status_code=status_code,
+                payload=dict(payload),
+            )
 
     def to_response(self, response: httpx.Response) -> Response:
         """Validate a successful JSON body into a :class:`Response`."""
