@@ -15,7 +15,8 @@ import pytest
 import respx
 from typer.testing import CliRunner
 
-from pyonyphe import AsyncOnyphe, Onyphe, _specs as specs
+from pyonyphe import AsyncOnyphe, Onyphe
+from pyonyphe import _specs as specs
 from pyonyphe.cli import app
 from pyonyphe.errors import (
     NotFoundError,
