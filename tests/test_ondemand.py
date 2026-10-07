@@ -239,9 +239,11 @@ def test_launch_is_not_replayed_on_a_server_error(
 ) -> None:
     # Replaying a POST would start a second scan and burn credits.
     route = respx.post(url).mock(return_value=httpx.Response(502, json={"text": "bad gateway"}))
-    with Onyphe(API_KEY, max_retries=3, backoff=0.0) as client:
-        with pytest.raises(ServerError):
-            launch(client)
+    with (
+        Onyphe(API_KEY, max_retries=3, backoff=0.0) as client,
+        pytest.raises(ServerError),
+    ):
+        launch(client)
     assert route.call_count == 1
 
 
@@ -250,9 +252,11 @@ def test_launch_is_not_replayed_on_a_rate_limit() -> None:
     route = respx.post(SINGLE_IP).mock(
         return_value=httpx.Response(429, headers={"Retry-After": "0"}, json={"text": "slow down"})
     )
-    with Onyphe(API_KEY, max_retries=3, backoff=0.0) as client:
-        with pytest.raises(RateLimitError):
-            client.ondemand_scope_ip("8.8.8.8")
+    with (
+        Onyphe(API_KEY, max_retries=3, backoff=0.0) as client,
+        pytest.raises(RateLimitError),
+    ):
+        client.ondemand_scope_ip("8.8.8.8")
     assert route.call_count == 1
 
 
@@ -260,9 +264,11 @@ def test_launch_is_not_replayed_on_a_rate_limit() -> None:
 def test_launch_is_not_replayed_on_a_transport_failure() -> None:
     # The scan may well have started: ONYPHE just never got to answer.
     route = respx.post(SINGLE_IP).mock(side_effect=httpx.ConnectError("boom"))
-    with Onyphe(API_KEY, max_retries=3, backoff=0.0) as client:
-        with pytest.raises(TransportError):
-            client.ondemand_scope_ip("8.8.8.8")
+    with (
+        Onyphe(API_KEY, max_retries=3, backoff=0.0) as client,
+        pytest.raises(TransportError),
+    ):
+        client.ondemand_scope_ip("8.8.8.8")
     assert route.call_count == 1
 
 
