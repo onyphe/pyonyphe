@@ -28,6 +28,7 @@ from .errors import (
     ParamError,
     PaymentRequiredError,
     RateLimitError,
+    ScanInProgressError,
     ServerError,
     TransportError,
 )
@@ -58,6 +59,7 @@ __all__ = [
     "PaymentRequiredError",
     "RateLimitError",
     "Response",
+    "ScanInProgressError",
     "ServerError",
     "Settings",
     "TransportError",
