@@ -22,7 +22,7 @@ from . import __version__
 from ._specs import BestCategory, BulkSimpleCategory, SimpleCategory, SummaryKind
 from .client import Onyphe
 from .config import load_settings
-from .errors import OnypheError
+from .errors import OnypheError, ScanInProgressError
 
 app = typer.Typer(
     name="pyonyphe",
@@ -32,8 +32,12 @@ app = typer.Typer(
 )
 alert_app = typer.Typer(help="Manage ONYPHE alerts.", no_args_is_help=True)
 bulk_app = typer.Typer(help="Bulk endpoints, fed from a file of assets.", no_args_is_help=True)
+ondemand_app = typer.Typer(
+    help="On-demand active scans; needs an On-demand subscription.", no_args_is_help=True
+)
 app.add_typer(alert_app, name="alert")
 app.add_typer(bulk_app, name="bulk")
+app.add_typer(ondemand_app, name="ondemand")
 
 out = Console()
 err = Console(stderr=True)
@@ -145,6 +149,26 @@ def run(rows: Iterator[dict[str, Any]], output: Path | None) -> None:
     """Consume a streaming endpoint, reporting progress on stderr."""
     count = emit_ndjson(rows, output)
     err.print(f"[dim]{count} document(s)[/dim]")
+
+
+def _ports(value: str | None) -> list[int] | None:
+    """Parse ``--ports 80,443`` into the list the client expects."""
+    if value is None:
+        return None
+    try:
+        return [int(part) for part in value.split(",") if part.strip()]
+    except ValueError as exc:
+        raise typer.BadParameter(f"not a comma-separated port list: {value!r}") from exc
+
+
+def _targets(file: Path) -> list[str]:
+    """Read one scan target per line, ignoring blank lines."""
+    try:
+        text = file.read_text(encoding="utf-8")
+    except OSError as exc:
+        err.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+    return [line.strip() for line in text.splitlines() if line.strip()]
 
 
 def _version_callback(value: bool) -> None:
@@ -382,6 +406,194 @@ def bulk_discovery(
         except OnypheError as exc:
             err.print(f"[red]{exc}[/red]")
             raise typer.Exit(code=1) from exc
+
+
+@ondemand_app.command("ip")
+def ondemand_ip(
+    ip: Annotated[str, typer.Argument(help="IP address or CIDR, e.g. 8.8.8.8 or 8.8.8.0/24.")],
+    import_results: Annotated[
+        bool | None,
+        typer.Option(
+            "--import/--no-import",
+            help="Import the results into ONYPHE, which makes them PUBLIC.",
+        ),
+    ] = None,
+    vulnscan: Annotated[
+        bool | None, typer.Option("--vulnscan/--no-vulnscan", help="Also run the vuln scan.")
+    ] = None,
+    urlscan: Annotated[
+        bool | None, typer.Option("--urlscan/--no-urlscan", help="Also crawl the HTTP services.")
+    ] = None,
+    ports: Annotated[
+        str | None, typer.Option("--ports", help="Ports to scan, comma separated: 80,443.")
+    ] = None,
+    maxscantime: Annotated[
+        int | None, typer.Option("--maxscantime", help="Scan budget, in seconds.")
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+) -> None:
+    """Launch an active scan of one IP address or CIDR."""
+    with get_client() as client:
+        try:
+            response = client.ondemand_scope_ip(
+                ip,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=_ports(ports),
+                maxscantime=maxscantime,
+            )
+        except OnypheError as exc:
+            err.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=1) from exc
+    emit_json(response.model_dump(), output)
+
+
+@ondemand_app.command("domain")
+def ondemand_domain(
+    domain: Annotated[str, typer.Argument(help="Domain to scan, e.g. example.com.")],
+    import_results: Annotated[
+        bool | None,
+        typer.Option(
+            "--import/--no-import",
+            help="Import the results into ONYPHE, which makes them PUBLIC.",
+        ),
+    ] = None,
+    vulnscan: Annotated[
+        bool | None, typer.Option("--vulnscan/--no-vulnscan", help="Also run the vuln scan.")
+    ] = None,
+    urlscan: Annotated[
+        bool | None, typer.Option("--urlscan/--no-urlscan", help="Also crawl the HTTP services.")
+    ] = None,
+    ports: Annotated[
+        str | None, typer.Option("--ports", help="Ports to scan, comma separated: 80,443.")
+    ] = None,
+    maxscantime: Annotated[
+        int | None, typer.Option("--maxscantime", help="Scan budget, in seconds.")
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+) -> None:
+    """Launch an active scan of one domain."""
+    with get_client() as client:
+        try:
+            response = client.ondemand_scope_domain(
+                domain,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=_ports(ports),
+                maxscantime=maxscantime,
+            )
+        except OnypheError as exc:
+            err.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=1) from exc
+    emit_json(response.model_dump(), output)
+
+
+@ondemand_app.command("ip-bulk")
+def ondemand_ip_bulk(
+    file: Annotated[Path, typer.Argument(help="One IP address or CIDR per line.")],
+    import_results: Annotated[
+        bool | None,
+        typer.Option(
+            "--import/--no-import",
+            help="Import the results into ONYPHE, which makes them PUBLIC.",
+        ),
+    ] = None,
+    vulnscan: Annotated[
+        bool | None, typer.Option("--vulnscan/--no-vulnscan", help="Also run the vuln scan.")
+    ] = None,
+    urlscan: Annotated[
+        bool | None, typer.Option("--urlscan/--no-urlscan", help="Also crawl the HTTP services.")
+    ] = None,
+    ports: Annotated[
+        str | None, typer.Option("--ports", help="Ports to scan, comma separated: 80,443.")
+    ] = None,
+    maxscantime: Annotated[
+        int | None, typer.Option("--maxscantime", help="Scan budget, in seconds.")
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+) -> None:
+    """Launch one active scan covering a list of IP addresses or CIDRs."""
+    targets = _targets(file)
+    with get_client() as client:
+        try:
+            response = client.ondemand_scope_ip_bulk(
+                targets,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=_ports(ports),
+                maxscantime=maxscantime,
+            )
+        except OnypheError as exc:
+            err.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=1) from exc
+    emit_json(response.model_dump(), output)
+
+
+@ondemand_app.command("domain-bulk")
+def ondemand_domain_bulk(
+    file: Annotated[Path, typer.Argument(help="One domain per line.")],
+    import_results: Annotated[
+        bool | None,
+        typer.Option(
+            "--import/--no-import",
+            help="Import the results into ONYPHE, which makes them PUBLIC.",
+        ),
+    ] = None,
+    vulnscan: Annotated[
+        bool | None, typer.Option("--vulnscan/--no-vulnscan", help="Also run the vuln scan.")
+    ] = None,
+    urlscan: Annotated[
+        bool | None, typer.Option("--urlscan/--no-urlscan", help="Also crawl the HTTP services.")
+    ] = None,
+    ports: Annotated[
+        str | None, typer.Option("--ports", help="Ports to scan, comma separated: 80,443.")
+    ] = None,
+    maxscantime: Annotated[
+        int | None, typer.Option("--maxscantime", help="Scan budget, in seconds.")
+    ] = None,
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+) -> None:
+    """Launch one active scan covering a list of domains."""
+    targets = _targets(file)
+    with get_client() as client:
+        try:
+            response = client.ondemand_scope_domain_bulk(
+                targets,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=_ports(ports),
+                maxscantime=maxscantime,
+            )
+        except OnypheError as exc:
+            err.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=1) from exc
+    emit_json(response.model_dump(), output)
+
+
+@ondemand_app.command("result")
+def ondemand_result(
+    scan_id: Annotated[str, typer.Argument(help="Scan ID returned when the scan was launched.")],
+    fmt: Annotated[str, typer.Option("--format", "-f", help="table, json or ndjson.")] = "json",
+    output: Annotated[Path | None, typer.Option("--output", "-o")] = None,
+) -> None:
+    """Fetch the results of a scan launched earlier.
+
+    Exits with 3 when the scan is still running: retry later, nothing failed.
+    """
+    with get_client() as client:
+        try:
+            response = client.ondemand_scope_result(scan_id)
+        except ScanInProgressError as exc:
+            err.print(f"[yellow]{exc}[/yellow]")
+            raise typer.Exit(code=3) from exc
+        except OnypheError as exc:
+            err.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=1) from exc
+    render(response.results, fmt, output, f"scan {scan_id}")
 
 
 @alert_app.command("list")
