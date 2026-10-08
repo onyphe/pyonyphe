@@ -124,7 +124,7 @@ from pyonyphe import Onyphe
 
 with Onyphe() as api:
     launch = api.ondemand_scope_ip("8.8.8.0/24", vulnscan=True, ports=[80, 443])
-    print(launch.model_dump())   # the Scan ID is in there
+    print(launch.model_dump())  # the Scan ID is in there
 ```
 
 Then, with that Scan ID in hand:
@@ -150,7 +150,7 @@ Four launch methods, two of them taking a list of targets and joining it for
 you:
 
 ```python
-api.ondemand_scope_ip("8.8.8.8")              # or "8.8.8.0/24"
+api.ondemand_scope_ip("8.8.8.8")  # or "8.8.8.0/24"
 api.ondemand_scope_domain("example.com")
 api.ondemand_scope_ip_bulk(["1.1.1.1", "8.8.8.8", "10.0.0.0/24"])
 api.ondemand_scope_domain_bulk(["a.tld", "b.tld"])
