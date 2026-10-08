@@ -4,6 +4,59 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - unreleased
+
+### Added
+
+- **On-demand scope API**, on both `Onyphe` and `AsyncOnyphe`: active scanning
+  of an IP, a CIDR or a domain, one target at a time or in bulk, plus result
+  retrieval. **Needs an On-demand subscription**; without it the call comes
+  back as a `PaymentRequiredError`.
+
+  ```python
+  launch = api.ondemand_scope_ip("8.8.8.0/24", vulnscan=True, ports=[80, 443])
+  page = api.ondemand_scope_result(scan_id)
+  ```
+
+  - `ondemand_scope_ip(ip, ...)` — `POST /ondemand/scope/ip/single`
+  - `ondemand_scope_domain(domain, ...)` — `POST /ondemand/scope/domain/single`
+  - `ondemand_scope_ip_bulk(ips, ...)` — `POST /dev/ondemand/scope/ip/bulk`
+  - `ondemand_scope_domain_bulk(domains, ...)` — `POST /dev/ondemand/scope/domain/bulk`
+  - `ondemand_scope_result(scan_id)` — `GET /ondemand/scope/result/{scan_id}`
+
+  The two bulk endpoints live under ONYPHE's `/dev/` prefix and may move or
+  change shape without notice. `/ondemand/scope/domain/single` is not
+  documented upstream either: it is deduced by analogy with `ip/single` and
+  isolated in a single constant.
+
+  The four launch methods share the optional `import_results`, `vulnscan`,
+  `urlscan`, `ports` and `maxscantime` arguments, and send a key only when one
+  is given. `import_results` is spelled out because `import` is a Python
+  keyword — **it publishes the results in the ONYPHE dataset, where every
+  ONYPHE user can see them.**
+
+  A launch returns the raw envelope: ONYPHE documents that a Scan ID comes
+  back, but not the field it comes back in, so nothing is parsed out of it.
+  No polling helper either, for now.
+
+  The four launches are never retried automatically — a POST replayed after a
+  429, a 5xx or a transport failure would start a second scan, burning credits
+  or earning an error 9 (`Scan is already running`). `send()` grew a
+  keyword-only `retry: bool = True` for that; result retrieval, a GET, keeps
+  the usual retry behaviour.
+
+- `ScanInProgressError`, raised by `ondemand_scope_result` on ONYPHE error
+  codes 103 (`Scan ID is in progress`) and 111 (`Scan ID results are being
+  built`), whatever HTTP status carries them. It subclasses `APIError` and
+  carries `.scan_id`, so "retry later" is distinguishable from "failed". Every
+  other error code keeps the existing mapping.
+
+- CLI: `pyonyphe ondemand ip|domain|ip-bulk|domain-bulk|result`, with
+  `--import/--no-import`, `--vulnscan/--no-vulnscan`,
+  `--urlscan/--no-urlscan`, `--ports` and `--maxscantime`. The two bulk
+  commands read one target per line from a file. `ondemand result` exits with
+  3 while the scan is still running.
+
 ## [3.1.0] - 2026-08-04
 
 ### Changed

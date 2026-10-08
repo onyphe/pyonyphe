@@ -81,6 +81,10 @@ pyonyphe simple whois 8.8.8.8 --best
 pyonyphe resolve example.com
 pyonyphe bulk simple datascan ips.txt -o out.ndjson
 pyonyphe alert list
+
+# active scanning, On-demand subscription required
+pyonyphe ondemand ip 8.8.8.0/24 --vulnscan --ports 80,443
+pyonyphe ondemand result SCAN_ID
 ```
 
 ## Configuration

@@ -112,6 +112,69 @@ api.bulk_simple("datascan", ["1.1.1.1", "8.8.8.8"])
 api.bulk_summary("domain", domains_from_your_database)
 ```
 
+## On-demand scan
+
+Everything else on this page reads what ONYPHE already collected. The
+On-demand scope API makes ONYPHE *scan* an asset for you, which needs an
+**On-demand subscription** — without it the call comes back as a
+`PaymentRequiredError`.
+
+```python
+from pyonyphe import Onyphe
+
+with Onyphe() as api:
+    launch = api.ondemand_scope_ip("8.8.8.0/24", vulnscan=True, ports=[80, 443])
+    print(launch.model_dump())  # the Scan ID is in there
+```
+
+Then, with that Scan ID in hand:
+
+```python
+from pyonyphe import ScanInProgressError
+
+try:
+    page = api.ondemand_scope_result(scan_id)
+except ScanInProgressError as exc:
+    print(f"{exc.scan_id} is not done yet, try again later")
+else:
+    for document in page:
+        print(document)
+```
+
+ONYPHE states that a launch returns a Scan ID, but does not document the field
+it travels in, so the client returns the envelope as it came and parses
+nothing out of it. There is no polling helper yet either: retry
+`ondemand_scope_result` yourself.
+
+Four launch methods, two of them taking a list of targets and joining it for
+you:
+
+```python
+api.ondemand_scope_ip("8.8.8.8")  # or "8.8.8.0/24"
+api.ondemand_scope_domain("example.com")
+api.ondemand_scope_ip_bulk(["1.1.1.1", "8.8.8.8", "10.0.0.0/24"])
+api.ondemand_scope_domain_bulk(["a.tld", "b.tld"])
+```
+
+The two `_bulk` ones are served under the `/dev/` prefix, ONYPHE's development
+tree: they can move without notice.
+
+All four take the same optional arguments, and send nothing at all for the ones
+you leave out:
+
+| argument | sent as | meaning |
+| --- | --- | --- |
+| `import_results` | `import` | import the results into the ONYPHE dataset |
+| `vulnscan` | `vulnscan` | also run the vulnerability scan |
+| `urlscan` | `urlscan` | also crawl the HTTP services found |
+| `ports` | `ports` | `[80, 443]` is sent as `"80,443"` |
+| `maxscantime` | `maxscantime` | scan budget, in seconds |
+
+`import_results` spells out what `import` cannot: the name is a Python
+keyword. **Importing makes the results PUBLIC** — they land in the ONYPHE
+dataset and every ONYPHE user can see them. Leave it alone unless that is what
+you want.
+
 ## Alerts
 
 ```python
@@ -141,11 +204,16 @@ Every exception derives from `OnypheError`:
 | `PaymentRequiredError` | 402 — credits exhausted, or API not in your license |
 | `NotFoundError` | 404 |
 | `RateLimitError` | 429, with `.retry_after` when ONYPHE says so |
+| `ScanInProgressError` | an On-demand scan has no results yet, with `.scan_id` |
 | `ServerError` | 5xx |
 
 `AuthenticationError`, `PaymentRequiredError`, `NotFoundError`,
-`RateLimitError` and `ServerError` all subclass `APIError`, which carries
-`.status_code` and the decoded `.payload`.
+`RateLimitError`, `ScanInProgressError` and `ServerError` all subclass
+`APIError`, which carries `.status_code` and the decoded `.payload`.
+
+`ScanInProgressError` is the odd one: it reports ONYPHE error code 103 or 111
+on an On-demand scan, which means "not ready", not "failed". Catch it to retry
+rather than to give up.
 
 429 and 5xx are retried automatically (`max_retries`, exponential backoff,
 honouring `Retry-After`); the exception only surfaces once the retries are
@@ -153,9 +221,9 @@ exhausted.
 
 ## Endpoints not wrapped yet
 
-The Ondemand APIv3 (`scope`, `resolver`) and the beta ASD APIv1 are not
-wrapped. Reach them with the escape hatch, which handles auth, retries and
-error mapping like any other call:
+The Ondemand `resolver` endpoints and the beta ASD APIv1 are not wrapped
+(`ondemand/scope` is, see above). Reach them with the escape hatch, which
+handles auth, retries and error mapping like any other call:
 
 ```python
 api.request("GET", "some/new/endpoint", params={"q": "..."})

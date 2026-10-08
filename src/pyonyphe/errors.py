@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 __all__ = [
+    "SCAN_IN_PROGRESS_CODES",
     "APIError",
     "AuthenticationError",
     "ConfigError",
@@ -11,9 +12,14 @@ __all__ = [
     "ParamError",
     "PaymentRequiredError",
     "RateLimitError",
+    "ScanInProgressError",
     "ServerError",
     "TransportError",
 ]
+
+#: ONYPHE error codes meaning "not ready yet" rather than "failed": 103 is
+#: ``Scan ID is in progress``, 111 is ``Scan ID results are being built``.
+SCAN_IN_PROGRESS_CODES: frozenset[int] = frozenset({103, 111})
 
 
 class OnypheError(Exception):
@@ -86,6 +92,26 @@ class RateLimitError(APIError):
     ) -> None:
         super().__init__(message, status_code=status_code, payload=payload)
         self.retry_after = retry_after
+
+
+class ScanInProgressError(APIError):
+    """The On-demand scan is still running, or its results are being built.
+
+    Not a failure: the same ``scan_id`` is worth asking for again later.
+
+    :param scan_id: identifier of the scan that has no results yet
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        scan_id: str,
+        status_code: int | None = None,
+        payload: dict[str, object] | None = None,
+    ) -> None:
+        super().__init__(message, status_code=status_code, payload=payload)
+        self.scan_id = scan_id
 
 
 class ServerError(APIError):

@@ -20,7 +20,7 @@ from ._specs import (
     Spec,
     SummaryKind,
 )
-from .errors import TransportError
+from .errors import APIError, TransportError
 from .models import Alert, Response
 
 __all__ = ["Onyphe"]
@@ -72,25 +72,29 @@ class Onyphe(BaseClient):
             kwargs["json"] = prepared.json
         return kwargs
 
-    def send(self, spec: Spec) -> Response:
+    def send(self, spec: Spec, *, retry: bool = True) -> Response:
         """Send a non-streaming spec, retrying transient failures.
 
+        :param retry: ``False`` sends the request exactly once, for calls that
+            are not idempotent -- no replay on 429/5xx, none on a transport
+            failure either
         :raises TransportError: when the request never reached ONYPHE
         :raises APIError: on any non-2xx answer
         """
         prepared = self.prepare(spec)
         kwargs = self._kwargs(prepared)
+        max_retries = self.max_retries if retry else 0
         last_error: Exception | None = None
-        for attempt in range(self.max_retries + 1):
+        for attempt in range(max_retries + 1):
             try:
                 response = self._client.request(prepared.method, prepared.url, **kwargs)
             except httpx.HTTPError as exc:
                 last_error = TransportError(f"unable to reach ONYPHE: {exc}")
-                if attempt >= self.max_retries:
+                if attempt >= max_retries:
                     raise last_error from exc
                 time.sleep(self.retry_delay(attempt))
                 continue
-            if response.status_code in RETRY_STATUS and attempt < self.max_retries:
+            if response.status_code in RETRY_STATUS and attempt < max_retries:
                 header = response.headers.get("Retry-After", "")
                 after = float(header) if header.replace(".", "", 1).isdigit() else None
                 time.sleep(self.retry_delay(attempt, after))
@@ -270,6 +274,150 @@ class Onyphe(BaseClient):
     def discovery(self, category: str, source: BulkSource) -> Iterator[dict[str, Any]]:
         """Discovery API: several OQL queries at once (Griffin View only)."""
         return self.stream(specs.discovery(category, source))
+
+    # -- on-demand scope ----------------------------------------------------
+
+    def ondemand_scope_ip(
+        self,
+        ip: str,
+        *,
+        import_results: bool | None = None,
+        vulnscan: bool | None = None,
+        urlscan: bool | None = None,
+        ports: Iterable[int] | None = None,
+        maxscantime: int | None = None,
+    ) -> Response:
+        """Launch an active scan of one IP address or CIDR.
+
+        Needs an On-demand subscription. Sent once, never retried: replaying
+        the POST would start a second scan.
+
+        :param ip: ``X.Y.Z.K`` or ``X.Y.Z.K/24``
+        :param import_results: import the results into the ONYPHE dataset,
+            which makes them **PUBLIC** -- visible to every ONYPHE user
+        :param vulnscan: also run the vulnerability scan
+        :param urlscan: also crawl the HTTP services found
+        :param ports: ports to scan instead of the ONYPHE default
+        :param maxscantime: scan budget, in seconds
+        :returns: the raw envelope, which carries the scan identifier to hand
+            to :meth:`ondemand_scope_result`
+        """
+        return self.send(
+            specs.ondemand_scope_ip(
+                ip,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=ports,
+                maxscantime=maxscantime,
+            ),
+            retry=False,
+        )
+
+    def ondemand_scope_domain(
+        self,
+        domain: str,
+        *,
+        import_results: bool | None = None,
+        vulnscan: bool | None = None,
+        urlscan: bool | None = None,
+        ports: Iterable[int] | None = None,
+        maxscantime: int | None = None,
+    ) -> Response:
+        """Launch an active scan of one domain.
+
+        Needs an On-demand subscription. Options are the ones of
+        :meth:`ondemand_scope_ip`, ``import_results`` included: it makes the
+        results **PUBLIC** on ONYPHE.
+        """
+        return self.send(
+            specs.ondemand_scope_domain(
+                domain,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=ports,
+                maxscantime=maxscantime,
+            ),
+            retry=False,
+        )
+
+    def ondemand_scope_ip_bulk(
+        self,
+        ips: Iterable[str],
+        *,
+        import_results: bool | None = None,
+        vulnscan: bool | None = None,
+        urlscan: bool | None = None,
+        ports: Iterable[int] | None = None,
+        maxscantime: int | None = None,
+    ) -> Response:
+        """Launch one active scan covering several IP addresses or CIDRs.
+
+        Needs an On-demand subscription. Served from the ``/dev/`` prefix, so
+        ONYPHE may still move it. Options are the ones of
+        :meth:`ondemand_scope_ip`, ``import_results`` included: it makes the
+        results **PUBLIC** on ONYPHE.
+
+        :param ips: any iterable of assets; joined with commas for you
+        """
+        return self.send(
+            specs.ondemand_scope_ip_bulk(
+                ips,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=ports,
+                maxscantime=maxscantime,
+            ),
+            retry=False,
+        )
+
+    def ondemand_scope_domain_bulk(
+        self,
+        domains: Iterable[str],
+        *,
+        import_results: bool | None = None,
+        vulnscan: bool | None = None,
+        urlscan: bool | None = None,
+        ports: Iterable[int] | None = None,
+        maxscantime: int | None = None,
+    ) -> Response:
+        """Launch one active scan covering several domains.
+
+        Needs an On-demand subscription. Served from the ``/dev/`` prefix, so
+        ONYPHE may still move it. Options are the ones of
+        :meth:`ondemand_scope_ip`, ``import_results`` included: it makes the
+        results **PUBLIC** on ONYPHE.
+
+        :param domains: any iterable of domains; joined with commas for you
+        """
+        return self.send(
+            specs.ondemand_scope_domain_bulk(
+                domains,
+                import_results=import_results,
+                vulnscan=vulnscan,
+                urlscan=urlscan,
+                ports=ports,
+                maxscantime=maxscantime,
+            ),
+            retry=False,
+        )
+
+    def ondemand_scope_result(self, scan_id: str) -> Response:
+        """Fetch the results of a scan launched earlier.
+
+        :param scan_id: identifier returned when the scan was launched
+        :raises ScanInProgressError: while the scan runs or its results are
+            being built -- retry later, nothing failed
+        """
+        try:
+            response = self.send(specs.ondemand_scope_result(scan_id))
+        except APIError as exc:
+            self.raise_for_scan(scan_id, exc.payload, status_code=exc.status_code)
+            raise
+        self.raise_for_scan(scan_id, response.model_dump())
+        return response
 
     # -- alerts -------------------------------------------------------------
 

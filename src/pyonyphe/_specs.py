@@ -17,6 +17,12 @@ from .errors import ParamError
 __all__ = [
     "BEST_CATEGORIES",
     "BULK_SIMPLE_CATEGORIES",
+    "DEV_PREFIX",
+    "ONDEMAND_SCOPE_DOMAIN_BULK_PATH",
+    "ONDEMAND_SCOPE_DOMAIN_PATH",
+    "ONDEMAND_SCOPE_IP_BULK_PATH",
+    "ONDEMAND_SCOPE_IP_PATH",
+    "ONDEMAND_SCOPE_RESULT_PATH",
     "SEARCH_MAX_RESULTS",
     "SIMPLE_CATEGORIES",
     "SUMMARY_KINDS",
@@ -30,6 +36,18 @@ __all__ = [
 
 #: Hard limit enforced by the Search API; beyond that you need Export.
 SEARCH_MAX_RESULTS = 10_000
+
+#: Prefix of the endpoints ONYPHE still serves from its development tree. The
+#: On-demand bulk endpoints live there and may move without notice.
+DEV_PREFIX = "dev"
+
+ONDEMAND_SCOPE_IP_PATH = "ondemand/scope/ip/single"
+#: Deduced by analogy with :data:`ONDEMAND_SCOPE_IP_PATH`; the ONYPHE
+#: documentation does not spell this one out.
+ONDEMAND_SCOPE_DOMAIN_PATH = "ondemand/scope/domain/single"
+ONDEMAND_SCOPE_IP_BULK_PATH = f"{DEV_PREFIX}/ondemand/scope/ip/bulk"
+ONDEMAND_SCOPE_DOMAIN_BULK_PATH = f"{DEV_PREFIX}/ondemand/scope/domain/bulk"
+ONDEMAND_SCOPE_RESULT_PATH = "ondemand/scope/result"
 
 SimpleCategory = Literal[
     "ctl",
@@ -251,6 +269,133 @@ def bulk_simple_best(category: BestCategory, source: str | Path | Iterable[str] 
 def discovery(category: str, source: str | Path | Iterable[str] | bytes) -> Spec:
     """Discovery API: run several OQL queries at once against one category."""
     return Spec("POST", f"bulk/discovery/{category}/asset", content=to_payload(source), stream=True)
+
+
+# --------------------------------------------------------------------------
+# On-demand scope API -- POST a JSON body, get a scan identifier back
+# --------------------------------------------------------------------------
+
+
+def _scan_options(
+    import_results: bool | None,
+    vulnscan: bool | None,
+    urlscan: bool | None,
+    ports: Iterable[int] | None,
+    maxscantime: int | None,
+) -> dict[str, Any]:
+    """Serialise the optional scan tuning, omitting whatever was left out.
+
+    ``import_results`` travels as ``import``, a Python keyword, and the three
+    booleans travel as the strings ONYPHE documents rather than as JSON
+    booleans.
+    """
+    body: dict[str, Any] = {}
+    if import_results is not None:
+        body["import"] = _flag(import_results)
+    if vulnscan is not None:
+        body["vulnscan"] = _flag(vulnscan)
+    if urlscan is not None:
+        body["urlscan"] = _flag(urlscan)
+    if ports is not None:
+        body["ports"] = ",".join(str(port) for port in ports)
+    if maxscantime is not None:
+        body["maxscantime"] = maxscantime
+    return body
+
+
+def _scope_spec(path: str, field: str, value: str, options: dict[str, Any]) -> Spec:
+    if not value:
+        raise ParamError(f"a {field} is required")
+    return Spec("POST", path, json={field: value, **options})
+
+
+def _join(values: Iterable[str], label: str) -> str:
+    """Join scan targets into the comma-separated string ONYPHE expects."""
+    # A bare string is iterable: wrap it, or it would be split per character.
+    items = [str(value).strip() for value in ([values] if isinstance(values, str) else values)]
+    items = [item for item in items if item]
+    if not items:
+        raise ParamError(f"empty {label} list")
+    return ",".join(items)
+
+
+def ondemand_scope_ip(
+    ip: str,
+    *,
+    import_results: bool | None = None,
+    vulnscan: bool | None = None,
+    urlscan: bool | None = None,
+    ports: Iterable[int] | None = None,
+    maxscantime: int | None = None,
+) -> Spec:
+    """On-demand scan of a single IP address or CIDR."""
+    return _scope_spec(
+        ONDEMAND_SCOPE_IP_PATH,
+        "ip",
+        ip,
+        _scan_options(import_results, vulnscan, urlscan, ports, maxscantime),
+    )
+
+
+def ondemand_scope_domain(
+    domain: str,
+    *,
+    import_results: bool | None = None,
+    vulnscan: bool | None = None,
+    urlscan: bool | None = None,
+    ports: Iterable[int] | None = None,
+    maxscantime: int | None = None,
+) -> Spec:
+    """On-demand scan of a single domain."""
+    return _scope_spec(
+        ONDEMAND_SCOPE_DOMAIN_PATH,
+        "domain",
+        domain,
+        _scan_options(import_results, vulnscan, urlscan, ports, maxscantime),
+    )
+
+
+def ondemand_scope_ip_bulk(
+    ips: Iterable[str],
+    *,
+    import_results: bool | None = None,
+    vulnscan: bool | None = None,
+    urlscan: bool | None = None,
+    ports: Iterable[int] | None = None,
+    maxscantime: int | None = None,
+) -> Spec:
+    """On-demand scan of several IP addresses or CIDRs at once."""
+    return _scope_spec(
+        ONDEMAND_SCOPE_IP_BULK_PATH,
+        "ip",
+        _join(ips, "ip"),
+        _scan_options(import_results, vulnscan, urlscan, ports, maxscantime),
+    )
+
+
+def ondemand_scope_domain_bulk(
+    domains: Iterable[str],
+    *,
+    import_results: bool | None = None,
+    vulnscan: bool | None = None,
+    urlscan: bool | None = None,
+    ports: Iterable[int] | None = None,
+    maxscantime: int | None = None,
+) -> Spec:
+    """On-demand scan of several domains at once."""
+    return _scope_spec(
+        ONDEMAND_SCOPE_DOMAIN_BULK_PATH,
+        "domain",
+        _join(domains, "domain"),
+        _scan_options(import_results, vulnscan, urlscan, ports, maxscantime),
+    )
+
+
+def ondemand_scope_result(scan_id: str) -> Spec:
+    """Results of a scan launched earlier, by scan identifier."""
+    if not scan_id:
+        raise ParamError("a scan id is required")
+    return Spec("GET", f"{ONDEMAND_SCOPE_RESULT_PATH}/{scan_id}")
 
 
 # --------------------------------------------------------------------------

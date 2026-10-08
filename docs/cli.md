@@ -111,6 +111,52 @@ pyonyphe bulk simple whois ips.txt --best
 
 One OQL query per line, all run against the given category. Griffin View only.
 
+### `ondemand ip IP | ondemand domain DOMAIN`
+
+Launch an active scan. **Needs an On-demand subscription.** Prints the raw
+ONYPHE envelope, which carries the Scan ID to pass to `ondemand result`.
+
+```bash
+pyonyphe ondemand ip 8.8.8.8
+pyonyphe ondemand ip 8.8.8.0/24 --vulnscan --ports 80,443 --maxscantime 120
+pyonyphe ondemand domain example.com --urlscan
+```
+
+| option | meaning |
+| --- | --- |
+| `--import` / `--no-import` | import the results into the ONYPHE dataset |
+| `--vulnscan` / `--no-vulnscan` | also run the vulnerability scan |
+| `--urlscan` / `--no-urlscan` | also crawl the HTTP services found |
+| `--ports 80,443` | ports to scan instead of the ONYPHE default |
+| `--maxscantime 120` | scan budget, in seconds |
+
+Each option is sent only when given: passing none of them leaves every
+default to ONYPHE. `--import` **makes the results PUBLIC** — they are added to
+the ONYPHE dataset, where every ONYPHE user can see them.
+
+### `ondemand ip-bulk FILE | ondemand domain-bulk FILE`
+
+Same options, one target per line in `FILE`, all scanned under a single Scan
+ID. Both endpoints sit under the ONYPHE `/dev/` prefix and may move without
+notice.
+
+```bash
+pyonyphe ondemand ip-bulk ips.txt --no-import
+pyonyphe ondemand domain-bulk domains.txt
+```
+
+### `ondemand result SCAN_ID`
+
+Fetch the results of a scan launched earlier.
+
+```bash
+pyonyphe ondemand result 0123456789abcdef
+```
+
+Exits with **3** when ONYPHE answers that the scan is still running or that
+its results are being built (error codes 103 and 111) — retry later, nothing
+failed. Other API errors still exit with 1.
+
 ### `alert list | add | del`
 
 ```bash
